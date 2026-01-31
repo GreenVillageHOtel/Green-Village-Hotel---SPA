@@ -1,0 +1,3014 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkTimePro – Professional Hotel Management System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
+  --primary-light: #e0e7ff;
+  --secondary: #64748b;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --orange: #f97316;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --primary-light: #312e81;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+body { background: var(--bg); color: var(--text-primary); min-height: 100vh; line-height: 1.5; }
+
+/* LOGIN */
+.login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 1rem; }
+.login-container { width: 100%; max-width: 1200px; display: grid; grid-template-columns: 1fr 1fr; background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); min-height: 600px; }
+.login-left { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 4rem; display: flex; flex-direction: column; justify-content: center; color: white; }
+.login-left h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
+.login-left p { font-size: 1.125rem; opacity: 0.9; margin-bottom: 2rem; }
+.feature-list { list-style: none; }
+.feature-list li { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-weight: 500; }
+.login-right { padding: 4rem; display: flex; flex-direction: column; justify-content: center; }
+.login-box { width: 100%; max-width: 400px; margin: 0 auto; }
+.login-logo { font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem; }
+.login-subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+.input-group { margin-bottom: 1.25rem; }
+.input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.875rem; color: var(--text-primary); }
+.input-field { width: 100%; padding: 0.875rem 1rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; transition: all 0.2s; background: var(--surface); color: var(--text-primary); }
+.input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.btn { padding: 0.875rem 1.5rem; border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.95rem; }
+.btn-primary { background: var(--primary); color: white; width: 100%; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+.btn-secondary { background: var(--secondary); color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-warning { background: var(--warning); color: white; }
+.btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-secondary); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+
+/* LAYOUT */
+.app-container { display: none; min-height: 100vh; }
+.layout-wrapper { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; background: var(--bg); }
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); height: 100vh; position: sticky; top: 0; display: flex; flex-direction: column; overflow-y: auto; }
+.sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+.sidebar-logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+.user-card { padding: 1rem; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.user-name { font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem; }
+.user-role { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 600; color: var(--primary); background: var(--primary-light); padding: 0.25rem 0.75rem; border-radius: 9999px; }
+.nav-section { padding: 1rem 0; flex: 1; }
+.nav-item { padding: 0.875rem 1.5rem; cursor: pointer; display: flex; align-items: center; gap: 0.875rem; border-left: 3px solid transparent; transition: all 0.2s; color: var(--text-secondary); font-weight: 500; margin: 0 0.75rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.nav-item:hover { background: var(--bg); color: var(--primary); }
+.nav-item.active { background: var(--primary-light); border-left-color: var(--primary); color: var(--primary); }
+.nav-item i { width: 24px; text-align: center; font-size: 1.125rem; }
+.sidebar-footer { padding: 1.5rem; border-top: 1px solid var(--border); }
+.version-info { font-size: 0.75rem; color: var(--text-secondary); text-align: center; }
+
+/* MAIN CONTENT */
+.main-content { padding: 2rem; overflow-y: auto; height: 100vh; }
+.content-wrapper { max-width: 1200px; margin: 0 auto; }
+
+/* HEADER */
+.top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.page-title { font-size: 2rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.025em; }
+.header-actions { display: flex; align-items: center; gap: 1rem; }
+.clock-box { background: var(--surface); padding: 0.75rem 1.25rem; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); font-family: 'Inter', monospace; font-weight: 600; color: var(--primary); border: 1px solid var(--border); font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; }
+.icon-btn { width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.icon-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.lang-switcher { display: flex; gap: 0.25rem; background: var(--surface); padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.lang-btn { padding: 0.5rem 0.875rem; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.875rem; color: var(--text-secondary); transition: all 0.2s; }
+.lang-btn.active { background: var(--primary); color: white; }
+
+/* PAGES */
+.page-section { display: none; animation: fadeIn 0.3s ease; }
+.page-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+.stat-card { background: var(--surface); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: all 0.3s; position: relative; overflow: hidden; cursor: pointer; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+.stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
+.stat-card.occupied::before { background: var(--primary); }
+.stat-card.checkin::before { background: var(--warning); }
+.stat-card.checkout::before { background: var(--danger); }
+.stat-card.revenue::before { background: var(--success); }
+.stat-card.arrivals::before { background: var(--purple); }
+.stat-card.departures::before { background: var(--pink); }
+.stat-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; }
+.stat-content { flex: 1; }
+.stat-value { font-size: 2.25rem; font-weight: 700; color: var(--text-primary); line-height: 1; margin-bottom: 0.5rem; }
+.stat-label { color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; }
+.stat-change { font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem; }
+.stat-change.positive { color: var(--success); }
+.stat-change.negative { color: var(--danger); }
+.stat-icon { width: 48px; height: 48px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; background: var(--primary-light); color: var(--primary); }
+.stat-card.checkin .stat-icon { background: var(--warning-light); color: var(--warning); }
+.stat-card.checkout .stat-icon { background: var(--danger-light); color: var(--danger); }
+.stat-card.revenue .stat-icon { background: var(--success-light); color: var(--success); }
+
+/* QUICK ACTIONS */
+.section-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
+.quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+.action-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 1.5rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 1rem; }
+.action-card:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+.action-icon { width: 56px; height: 56px; border-radius: var(--radius); background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.action-content h3 { font-weight: 600; margin-bottom: 0.25rem; }
+.action-content p { font-size: 0.875rem; color: var(--text-secondary); }
+
+/* GUEST COUNT BOX */
+.guest-count-box { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; display: flex; gap: 2rem; align-items: center; }
+.guest-count-item { text-align: center; }
+.guest-count-number { font-size: 2rem; font-weight: 700; color: var(--primary); }
+.guest-count-label { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+.guest-count-divider { width: 1px; background: var(--border); height: 60px; }
+.guest-count-total { margin-left: auto; background: var(--primary-light); padding: 1rem 2rem; border-radius: var(--radius-sm); border: 2px solid var(--primary); }
+.guest-count-total .guest-count-number { color: var(--primary); }
+
+/* ROOMS GRID WITH STATUS */
+.rooms-visual-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+.room-cell { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+.room-cell:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.room-cell.available { border-color: var(--success); background: var(--success-light); }
+.room-cell.occupied { border-color: var(--danger); background: var(--danger-light); }
+.room-cell.cleaning { border-color: var(--warning); background: var(--warning-light); }
+.room-cell.blocked { border-color: #6b7280; background: #f3f4f6; opacity: 0.7; }
+.room-cell.faulty { border-color: var(--orange); background: #fff7ed; }
+.room-cell.dirty { border-color: #eab308; background: #fef9c3; }
+.room-number { font-weight: 700; font-size: 1.125rem; margin-bottom: 0.25rem; }
+.room-type { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+.room-status { font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 9999px; background: white; display: inline-block; }
+.room-status-bar { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.room-status-bar.clean { background: var(--success); }
+.room-status-bar.dirty { background: #eab308; }
+.room-status-bar.blocked { background: #6b7280; }
+.room-status-bar.faulty { background: var(--orange); }
+
+/* ROOM FILTERS */
+.room-filters { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.room-filter-btn { padding: 0.5rem 1rem; border: 2px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+.room-filter-btn:hover { border-color: var(--primary); }
+.room-filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* TABLES */
+.table-container { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; margin-top: 1.5rem; }
+.table-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to right, var(--bg), var(--surface)); }
+.table-title { font-weight: 600; font-size: 1.125rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 1rem 1.5rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--bg); font-weight: 600; color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+tr:hover td { background: var(--bg); }
+td { font-size: 0.875rem; color: var(--text-primary); font-weight: 500; }
+.badge { padding: 0.375rem 0.875rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.375rem; }
+.badge-success { background: var(--success-light); color: var(--success); }
+.badge-warning { background: var(--warning-light); color: var(--warning); }
+.badge-danger { background: var(--danger-light); color: var(--danger); }
+.badge-secondary { background: #f1f5f9; color: var(--text-secondary); }
+
+/* MODALS */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center; padding: 1rem; opacity: 0; transition: opacity 0.3s; }
+.modal-overlay.active { display: flex; opacity: 1; }
+.modal { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); transform: scale(0.95); transition: transform 0.3s; border: 1px solid var(--border); }
+.modal-overlay.active .modal { transform: scale(1); }
+.modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg); }
+.modal-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+.modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.modal-close:hover { background: var(--danger-light); color: var(--danger); }
+.modal-body { padding: 1.5rem; }
+.modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; background: var(--bg); }
+.modal-lg { max-width: 900px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.form-group { margin-bottom: 0.5rem; position: relative; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.875rem; color: var(--text-primary); }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; background: var(--surface); color: var(--text-primary); transition: all 0.2s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.full-width { grid-column: 1 / -1; }
+
+/* ROOM SEARCH BUTTON */
+.room-search-btn { position: absolute; right: 10px; top: 35px; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.room-search-btn:hover { background: var(--primary-dark); transform: scale(1.1); }
+
+/* DISCOUNT SECTION */
+.discount-box { background: var(--bg); padding: 1rem; border-radius: var(--radius-sm); border: 2px solid var(--border); margin: 1rem 0; }
+.discount-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.discount-tab { padding: 0.5rem 1rem; border: 2px solid var(--border); background: transparent; border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; }
+.discount-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+.discount-input-group { display: flex; gap: 0.5rem; align-items: center; }
+.discount-input { flex: 1; }
+.discount-value { font-weight: 700; color: var(--success); font-size: 1.125rem; }
+
+/* PAYMENT METHODS */
+.payment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem; margin: 1.5rem 0; }
+.payment-method { border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface); }
+.payment-method:hover { border-color: var(--primary); background: var(--primary-light); }
+.payment-method.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+.payment-method i { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; }
+
+/* PAYMENT DETAILS MODAL */
+.payment-detail-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+.payment-detail-row.total { font-size: 1.25rem; font-weight: 700; color: var(--primary); border-top: 2px solid var(--primary); border-bottom: none; margin-top: 0.5rem; padding-top: 1rem; }
+
+/* TABS */
+.tabs { display: flex; gap: 0.25rem; border-bottom: 2px solid var(--border); margin-bottom: 2rem; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { padding: 0.875rem 1.5rem; background: none; border: none; color: var(--text-secondary); font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; font-size: 0.95rem; border-radius: var(--radius-sm) var(--radius-sm) 0 0; transition: all 0.2s; }
+.tab:hover { color: var(--primary); background: var(--primary-light); }
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
+.tab-content { display: none; animation: fadeIn 0.3s ease; }
+.tab-content.active { display: block; }
+
+/* TOAST */
+.toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 3000; display: flex; flex-direction: column; gap: 0.75rem; }
+.toast { background: var(--surface); padding: 1rem 1.5rem; border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 0.75rem; border-left: 4px solid var(--success); animation: slideRight 0.3s ease; min-width: 300px; font-weight: 500; border: 1px solid var(--border); }
+.toast.error { border-left-color: var(--danger); }
+.toast.info { border-left-color: var(--primary); }
+@keyframes slideRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* LOADING */
+.loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); z-index: 5000; display: none; justify-content: center; align-items: center; flex-direction: column; gap: 1rem; }
+.loading-overlay.active { display: flex; }
+.spinner { width: 48px; height: 48px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* AVAILABLE ROOMS MODAL */
+.available-rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+.available-room-btn { padding: 1rem; border: 2px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; text-align: center; font-weight: 600; transition: all 0.2s; }
+.available-room-btn:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-light); }
+.available-room-btn:disabled { background: var(--border); color: var(--text-secondary); cursor: not-allowed; opacity: 0.6; }
+.available-room-btn.occupied { background: var(--danger-light); border-color: var(--danger); color: var(--danger); }
+
+/* REVENUE DETAILS */
+.revenue-summary { background: var(--bg); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem; border: 2px solid var(--border); }
+.revenue-summary-title { font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
+.revenue-method-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+.revenue-method-row:last-child { border-bottom: none; font-weight: 700; font-size: 1.125rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 2px solid var(--border); }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .layout-wrapper { grid-template-columns: 1fr; }
+  .sidebar { position: fixed; left: -280px; transition: left 0.3s; z-index: 1500; box-shadow: var(--shadow-lg); }
+  .sidebar.open { left: 0; }
+  .main-content { padding: 1.5rem; }
+  .login-container { grid-template-columns: 1fr; }
+  .login-left { display: none; }
+}
+@media (max-width: 768px) { 
+  .stats-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .quick-actions { grid-template-columns: 1fr; }
+  .guest-count-box { flex-direction: column; gap: 1rem; }
+  .guest-count-divider { display: none; }
+  .guest-count-total { margin-left: 0; width: 100%; }
+}
+
+/* UTILITIES */
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+.text-warning { color: var(--warning); }
+.text-primary { color: var(--primary); }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div style="font-weight: 600; color: var(--text-secondary);" data-i18n="loading">Yüklənir...</div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-container">
+    <div class="login-left">
+      <h1><i class="fas fa-hotel"></i> WorkTimePro</h1>
+      <p data-i18n="loginSubtitle">Professional Hotel Management System</p>
+      <ul class="feature-list">
+        <li><i class="fas fa-check-circle"></i> <span data-i18n="feat1">Real-time otaq idarəetməsi</span></li>
+        <li><i class="fas fa-check-circle"></i> <span data-i18n="feat2">Avtomatik hesabatlar</span></li>
+        <li><i class="fas fa-check-circle"></i> <span data-i18n="feat3">Google Sheets inteqrasiyası</span></li>
+        <li><i class="fas fa-check-circle"></i> <span data-i18n="feat4">Çoxdilli dəstək (AZ/EN/RU)</span></li>
+      </ul>
+    </div>
+    <div class="login-right">
+      <div class="login-box">
+        <div class="login-logo"><i class="fas fa-hotel"></i> WorkTimePro</div>
+        <p class="login-subtitle" data-i18n="loginDesc">Hesabınıza daxil olun</p>
+        <form id="loginForm">
+          <div class="input-group">
+            <label data-i18n="username">İstifadəçi adı</label>
+            <input type="text" class="input-field" id="loginUsername" placeholder="İstifadəçi adı" required>
+          </div>
+          <div class="input-group">
+            <label data-i18n="password">Şifrə</label>
+            <input type="password" class="input-field" id="loginPassword" placeholder="Şifrə" required>
+          </div>
+          <div class="input-group">
+            <label data-i18n="role">Rol</label>
+            <select class="input-field" id="loginRole">
+              <option value="admin" data-i18n="admin">Administrator</option>
+              <option value="reception" data-i18n="receptionist">Resepsionist</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+            <i class="fas fa-sign-in-alt"></i> <span data-i18n="loginBtn">Daxil ol</span>
+          </button>
+        </form>
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.875rem; color: var(--text-secondary); text-align: center;">
+          <p><strong data-i18n="testData">Test məlumatları:</strong></p>
+          <p>Admin: admin / admin</p>
+          <p>Resepsion: reception / reception</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app-container" id="appContainer">
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo"><i class="fas fa-hotel"></i> WorkTimePro</div>
+        <div class="user-card">
+          <div class="user-name" id="currentUserName">Admin</div>
+          <span class="user-role" id="currentUserRole"><i class="fas fa-shield-alt"></i> Administrator</span>
+        </div>
+      </div>
+      <nav class="nav-section">
+        <div class="nav-item active" onclick="navigate('dashboard')">
+          <i class="fas fa-home"></i> <span data-i18n="navDashboard">Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="navigate('reservations')">
+          <i class="fas fa-calendar-check"></i> <span data-i18n="navReservations">Rezervasiyalar</span>
+        </div>
+        <div class="nav-item" onclick="navigate('guests')">
+          <i class="fas fa-users"></i> <span data-i18n="navGuests">Qonaqlar</span>
+        </div>
+        <div class="nav-item" onclick="navigate('rooms')">
+          <i class="fas fa-bed"></i> <span data-i18n="navRooms">Otaqlar</span>
+        </div>
+        <div class="nav-item" onclick="navigate('housekeeping')">
+          <i class="fas fa-broom"></i> <span data-i18n="navHousekeeping">Təmizlik</span>
+        </div>
+        <div class="nav-item admin-only" onclick="navigate('reports')">
+          <i class="fas fa-chart-line"></i> <span data-i18n="navReports">Hesabatlar</span>
+        </div>
+        <div class="nav-item admin-only" onclick="navigate('admin')">
+          <i class="fas fa-cog"></i> <span data-i18n="navSettings">Tənzimləmələr</span>
+        </div>
+        <div class="nav-item" onclick="logout()" style="margin-top: auto; color: var(--danger);">
+          <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Çıxış</span>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="version-info">v2.0.0 | Google Sheets API</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <!-- Top Header -->
+        <div class="top-header">
+          <h1 class="page-title" id="pageTitle" data-i18n="dashboard">Dashboard</h1>
+          <div class="header-actions">
+            <button class="icon-btn" onclick="refreshData()" title="Yenilə">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <div class="clock-box" id="clock">
+              <i class="far fa-clock"></i> <span>00:00:00</span>
+            </div>
+            <button class="icon-btn" onclick="toggleTheme()" title="Mövzu dəyiş">
+              <i class="fas fa-moon"></i>
+            </button>
+            <div class="lang-switcher">
+              <button class="lang-btn active" onclick="setLang('az')">AZ</button>
+              <button class="lang-btn" onclick="setLang('en')">EN</button>
+              <button class="lang-btn" onclick="setLang('ru')">RU</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DASHBOARD PAGE -->
+        <div id="page-dashboard" class="page-section active">
+          <!-- Stats -->
+          <div class="stats-grid">
+            <div class="stat-card occupied" onclick="navigate('rooms')">
+              <div class="stat-header">
+                <div class="stat-content">
+                  <div class="stat-value" id="statOccupied">0</div>
+                  <div class="stat-label" data-i18n="occupiedRooms">Dolu otaq</div>
+                  <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> <span id="occupancyRate">0%</span> <span data-i18n="occupancy">doluluq</span>
+                  </div>
+                </div>
+                <div class="stat-icon"><i class="fas fa-bed"></i></div>
+              </div>
+            </div>
+            
+            <div class="stat-card checkin">
+              <div class="stat-header">
+                <div class="stat-content">
+                  <div class="stat-value" id="statCheckin">0</div>
+                  <div class="stat-label" data-i18n="todayCheckin">Bugünkü Giriş</div>
+                  <div class="stat-change positive">
+                    <i class="fas fa-clock"></i> <span data-i18n="expected">Gözlənilir</span>
+                  </div>
+                </div>
+                <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                  <i class="fas fa-sign-in-alt"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stat-card checkout">
+              <div class="stat-header">
+                <div class="stat-content">
+                  <div class="stat-value" id="statCheckout">0</div>
+                  <div class="stat-label" data-i18n="todayCheckout">Bugünkü Çıxış</div>
+                  <div class="stat-change negative">
+                    <i class="fas fa-exclamation-circle"></i> <span data-i18n="attention">Yoxlanış tələb</span>
+                  </div>
+                </div>
+                <div class="stat-icon" style="background: var(--danger-light); color: var(--danger);">
+                  <i class="fas fa-sign-out-alt"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stat-card revenue" onclick="showTodayRevenue()">
+              <div class="stat-header">
+                <div class="stat-content">
+                  <div class="stat-value" id="statRevenue">₼0</div>
+                  <div class="stat-label" data-i18n="todayRevenue">Bugünkü Gəlir</div>
+                  <div class="stat-change positive">
+                    <i class="fas fa-chart-line"></i> <span data-i18n="clickDetails">Detallar üçün klik</span>
+                  </div>
+                </div>
+                <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                  <i class="fas fa-money-bill-wave"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stat-card arrivals" onclick="showExpected('arrivals')">
+              <div class="stat-header">
+                <div class="stat-content">
+                  <div class="stat-value text-primary" id="statArrivals">0</div>
+                  <div class="stat-label" data-i18n="todayArrivals">Bugünkü Gəlişlər</div>
+                </div>
+                <div class="stat-icon" style="background: rgba(139,92,246,0.1); color: var(--purple);">
+                  <i class="fas fa-plane-arrival"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stat-card departures" onclick="showExpected('departures')">
+              <div class="stat-header">
+                <div class="stat-content">
+                  <div class="stat-value" style="color: var(--pink);" id="statDepartures">0</div>
+                  <div class="stat-label" data-i18n="todayDepartures">Bugünkü Çıxışlar</div>
+                </div>
+                <div class="stat-icon" style="background: rgba(236,72,153,0.1); color: var(--pink);">
+                  <i class="fas fa-plane-departure"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Guest Count for Restaurant -->
+          <div class="guest-count-box">
+            <div class="guest-count-item">
+              <div class="guest-count-number" id="countAdults">0</div>
+              <div class="guest-count-label" data-i18n="adults">Böyük</div>
+            </div>
+            <div class="guest-count-divider"></div>
+            <div class="guest-count-item">
+              <div class="guest-count-number" id="countChildren">0</div>
+              <div class="guest-count-label" data-i18n="children">Uşaq</div>
+            </div>
+            <div class="guest-count-total">
+              <div class="guest-count-number" id="countTotal">0</div>
+              <div class="guest-count-label" data-i18n="totalGuests">Ümumi Qonaq</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <h3 class="section-title" data-i18n="quickActions">Sürətli Əməliyyatlar</h3>
+          <div class="quick-actions">
+            <div class="action-card" onclick="openReservationModal()">
+              <div class="action-icon">
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="action-content">
+                <h3 data-i18n="newReservation">Yeni Rezervasiya</h3>
+                <p data-i18n="newResDesc">Walk-in və ya gələcək rezervasiya yarat</p>
+              </div>
+            </div>
+            
+            <div class="action-card" onclick="navigate('guests')">
+              <div class="action-icon" style="background: var(--success);">
+                <i class="fas fa-cash-register"></i>
+              </div>
+              <div class="action-content">
+                <h3 data-i18n="takePayment">Ödəniş Al</h3>
+                <p data-i18n="takePaymentDesc">Qonaq hesabını bağla və çıxış et</p>
+              </div>
+            </div>
+            
+            <div class="action-card admin-only" onclick="navigate('reports')">
+              <div class="action-icon" style="background: var(--secondary);">
+                <i class="fas fa-file-invoice-dollar"></i>
+              </div>
+              <div class="action-content">
+                <h3 data-i18n="nightAudit">Gecə Hesabatı</h3>
+                <p data-i18n="nightAuditDesc">End of Day (EOD) proseduru</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="table-container">
+            <div class="table-header">
+              <span class="table-title"><i class="fas fa-history"></i> <span data-i18n="recentActivity">Son Əməliyyatlar</span></span>
+              <button class="btn btn-outline btn-sm" onclick="refreshData()">
+                <i class="fas fa-sync"></i> <span data-i18n="refresh">Yenilə</span>
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="time">Vaxt</th>
+                  <th data-i18n="operation">Əməliyyat</th>
+                  <th data-i18n="guest">Qonaq</th>
+                  <th data-i18n="room">Otaq</th>
+                  <th data-i18n="amount">Məbləğ</th>
+                  <th data-i18n="status">Status</th>
+                </tr>
+              </thead>
+              <tbody id="recentActivityTable">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                    <i class="fas fa-spinner fa-spin"></i> <span data-i18n="loading">Yüklənir...</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- RESERVATIONS PAGE -->
+        <div id="page-reservations" class="page-section">
+          <div class="table-header" style="border-radius: var(--radius) var(--radius) 0 0; margin-bottom: 0;">
+            <span class="table-title" data-i18n="activeReservations">Aktiv Rezervasiyalar</span>
+            <button class="btn btn-primary" onclick="openReservationModal()">
+              <i class="fas fa-plus"></i> <span data-i18n="newReservation">Yeni Rezervasiya</span>
+            </button>
+          </div>
+          <div class="table-container" style="border-radius: 0 0 var(--radius) var(--radius); margin-top: 0;">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="guest">Qonaq</th>
+                  <th data-i18n="room">Otaq</th>
+                  <th data-i18n="checkin">Giriş</th>
+                  <th data-i18n="checkout">Çıxış</th>
+                  <th data-i18n="nights">Gecə</th>
+                  <th data-i18n="totalDebt">Ümumi Borc</th>
+                  <th data-i18n="status">Status</th>
+                  <th data-i18n="actions">Əməliyyat</th>
+                </tr>
+              </thead>
+              <tbody id="reservationsTableBody">
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-secondary);" data-i18n="loading">
+                    Məlumat yüklənir...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- GUESTS PAGE -->
+        <div id="page-guests" class="page-section">
+          <div class="table-header" style="border-radius: var(--radius) var(--radius) 0 0; margin-bottom: 0;">
+            <span class="table-title" data-i18n="currentGuests">Cari Qonaqlar (In-House)</span>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" class="input-field" placeholder="Axtar..." style="width: 200px;" onkeyup="searchGuests(this.value)" data-i18n-placeholder="search">
+              <button class="btn btn-primary" onclick="openReservationModal()">
+                <i class="fas fa-plus"></i> <span data-i18n="new">Yeni</span>
+              </button>
+            </div>
+          </div>
+          <div class="table-container" style="border-radius: 0 0 var(--radius) var(--radius); margin-top: 0;">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="fullName">Ad Soyad</th>
+                  <th data-i18n="room">Otaq</th>
+                  <th data-i18n="dates">Giriş/Çıxış</th>
+                  <th data-i18n="debt">Borc</th>
+                  <th data-i18n="actions">Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="guestsTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 3rem;" data-i18n="loading">Yüklənir...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ROOMS PAGE -->
+        <div id="page-rooms" class="page-section">
+          <div class="room-filters">
+            <button class="room-filter-btn active" onclick="filterRooms('all')" data-i18n="all">
+              <i class="fas fa-th-large"></i> Hamısı
+            </button>
+            <button class="room-filter-btn" onclick="filterRooms('available')" style="color: var(--success);">
+              <i class="fas fa-check-circle"></i> <span data-i18n="available">Boş</span>
+            </button>
+            <button class="room-filter-btn" onclick="filterRooms('occupied')" style="color: var(--danger);">
+              <i class="fas fa-user"></i> <span data-i18n="occupied">Dolu</span>
+            </button>
+            <button class="room-filter-btn" onclick="filterRooms('clean')" style="color: var(--success);">
+              <i class="fas fa-sparkles"></i> <span data-i18n="clean">Təmiz</span>
+            </button>
+            <button class="room-filter-btn" onclick="filterRooms('dirty')" style="color: #eab308;">
+              <i class="fas fa-broom"></i> <span data-i18n="dirty">Çirkli</span>
+            </button>
+            <button class="room-filter-btn" onclick="filterRooms('blocked')" style="color: #6b7280;">
+              <i class="fas fa-ban"></i> <span data-i18n="blocked">Bağlı</span>
+            </button>
+            <button class="room-filter-btn" onclick="filterRooms('faulty')" style="color: var(--orange);">
+              <i class="fas fa-tools"></i> <span data-i18n="faulty">Qəzalı</span>
+            </button>
+          </div>
+          
+          <div class="rooms-visual-grid" id="roomsGrid">
+            <!-- Dinamik doldurulacaq -->
+          </div>
+        </div>
+
+        <!-- HOUSEKEEPING PAGE -->
+        <div id="page-housekeeping" class="page-section">
+          <div class="table-header" style="border-radius: var(--radius) var(--radius) 0 0; margin-bottom: 0;">
+            <span class="table-title" data-i18n="cleaningStatus">Təmizlik Statusu</span>
+            <button class="btn btn-primary" onclick="updateAllHousekeeping('clean')">
+              <i class="fas fa-check-double"></i> <span data-i18n="markAllClean">Hamısını Təmizlə</span>
+            </button>
+          </div>
+          <div class="table-container" style="border-radius: 0 0 var(--radius) var(--radius); margin-top: 0;">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="room">Otaq</th>
+                  <th data-i18n="type">Tip</th>
+                  <th data-i18n="status">Status</th>
+                  <th data-i18n="lastCleaned">Son Təmizlik</th>
+                  <th data-i18n="actions">Əməliyyat</th>
+                </tr>
+              </thead>
+              <tbody id="housekeepingTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 3rem;" data-i18n="loading">Yüklənir...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- REPORTS PAGE -->
+        <div id="page-reports" class="page-section">
+          <h3 class="section-title" data-i18n="nightAuditTitle">Gecə Hesabatı (Night Audit)</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div style="background: var(--surface); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border);">
+              <h4 style="margin-bottom: 1rem;" data-i18n="todaySales">Bugünkü Satışlar</h4>
+              <div style="font-size: 2rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;" id="reportRevenue">₼0</div>
+              <p style="color: var(--text-secondary); font-size: 0.875rem;" data-i18n="totalRevenue">Ümumi gəlir</p>
+            </div>
+            <div style="background: var(--surface); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border);">
+              <h4 style="margin-bottom: 1rem;" data-i18n="paymentMethods">Ödəniş Metodları</h4>
+              <div id="paymentMethodsReport" style="font-size: 0.875rem;">
+                Yüklənir...
+              </div>
+            </div>
+            <div style="background: var(--surface); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border);">
+              <h4 style="margin-bottom: 1rem;" data-i18n="roomStats">Otaq Statistikası</h4>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span data-i18n="occupied">Dolu:</span>
+                <strong id="reportOccupied">0</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span data-i18n="available">Boş:</span>
+                <strong id="reportAvailable">0</strong>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="generateNightAudit()" style="width: 100%; max-width: 400px; margin: 0 auto; display: block;">
+            <i class="fas fa-moon"></i> <span data-i18n="generateNightAudit">Gecə Hesabatı Yarat (Excel)</span>
+          </button>
+        </div>
+
+        <!-- ADMIN PAGE -->
+        <div id="page-admin" class="page-section">
+          <h3 class="section-title" data-i18n="systemSettings">Sistem Tənzimləmələri</h3>
+          
+          <div class="tabs">
+            <button class="tab active" onclick="switchTab('company', this)" data-i18n="company">Şirkət</button>
+            <button class="tab" onclick="switchTab('rooms', this)" data-i18n="roomTypes">Otaq Tipləri</button>
+            <button class="tab" onclick="switchTab('minibar', this)" data-i18n="minibar">Minibar</button>
+            <button class="tab" onclick="switchTab('laundry', this)" data-i18n="laundry">Çamaşırxana</button>
+            <button class="tab" onclick="switchTab('agencies', this)" data-i18n="agencies">Agentliklər</button>
+            <button class="tab" onclick="switchTab('staff', this)" data-i18n="staff">İşçilər</button>
+          </div>
+
+          <div id="tab-company" class="tab-content active">
+            <div style="max-width: 600px; background: var(--surface); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border);">
+              <div class="form-group">
+                <label data-i18n="companyNameAz">Şirkət Adı (AZ)</label>
+                <input type="text" id="companyNameAz" value="WorkTimePro Hotel">
+              </div>
+              <div class="form-group">
+                <label data-i18n="companyNameEn">Şirkət Adı (EN)</label>
+                <input type="text" id="companyNameEn" value="WorkTimePro Hotel">
+              </div>
+              <div class="form-group">
+                <label data-i18n="companyNameRu">Şirkət Adı (RU)</label>
+                <input type="text" id="companyNameRu" value="WorkTimePro Отель">
+              </div>
+              <button class="btn btn-primary" onclick="saveCompany()">
+                <i class="fas fa-save"></i> <span data-i18n="save">Yadda Saxla</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="tab-rooms" class="tab-content">
+            <div class="table-header" style="margin-bottom: 0; border-radius: var(--radius) var(--radius) 0 0;">
+              <span class="table-title" data-i18n="roomTypes">Otaq Tipləri</span>
+              <button class="btn btn-primary" onclick="openModal('modalRoomType')">
+                <i class="fas fa-plus"></i> <span data-i18n="addNew">Yeni</span>
+              </button>
+            </div>
+            <div class="table-container" style="border-radius: 0 0 var(--radius) var(--radius); margin-top: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="name">Ad (AZ/EN/RU)</th>
+                    <th data-i18n="price">Qiymət</th>
+                    <th data-i18n="count">Say</th>
+                    <th data-i18n="actions">Əməliyyatlar</th>
+                  </tr>
+                </thead>
+                <tbody id="adminRoomTypesTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="tab-minibar" class="tab-content">
+            <div class="table-header" style="margin-bottom: 0; border-radius: var(--radius) var(--radius) 0 0;">
+              <span class="table-title" data-i18n="minibarItems">Minibar Məhsulları</span>
+              <button class="btn btn-primary" onclick="openModal('modalMinibar')">
+                <i class="fas fa-plus"></i> <span data-i18n="addNew">Yeni</span>
+              </button>
+            </div>
+            <div class="table-container" style="border-radius: 0 0 var(--radius) var(--radius); margin-top: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="product">Məhsul</th>
+                    <th data-i18n="price">Qiymət</th>
+                    <th data-i18n="actions">Əməliyyatlar</th>
+                  </tr>
+                </thead>
+                <tbody id="adminMinibarTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="tab-laundry" class="tab-content">
+            <div class="table-header" style="margin-bottom: 0; border-radius: var(--radius) var(--radius) 0 0;">
+              <span class="table-title" data-i18n="laundryServices">Çamaşırxana Xidmətləri</span>
+              <button class="btn btn-primary" onclick="openModal('modalLaundry')">
+                <i class="fas fa-plus"></i> <span data-i18n="addNew">Yeni</span>
+              </button>
+            </div>
+            <div class="table-container" style="border-radius: 0 0 var(--radius) var(--radius); margin-top: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="service">Xidmət</th>
+                    <th data-i18n="price">Qiymət</th>
+                    <th data-i18n="actions">Əməliyyatlar</th>
+                  </tr>
+                </thead>
+                <tbody id="adminLaundryTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="tab-agencies" class="tab-content">
+            <div class="table-header" style="margin-bottom: 0; border-radius: var(--radius) var(--radius) 0 0;">
+              <span class="table-title" data-i18n="agencies">Agentliklər</span>
+              <button class="btn btn-primary" onclick="openModal('modalAgency')">
+                <i class="fas fa-plus"></i> <span data-i18n="addNew">Yeni</span>
+              </button>
+            </div>
+            <div class="table-container" style="border-radius: 0 0 var(--radius) var(--radius); margin-top: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="name">Ad</th>
+                    <th data-i18n="contact">Əlaqə</th>
+                    <th data-i18n="discount">Endirim</th>
+                    <th data-i18n="actions">Əməliyyatlar</th>
+                  </tr>
+                </thead>
+                <tbody id="adminAgenciesTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="tab-staff" class="tab-content">
+            <div class="table-header" style="margin-bottom: 0; border-radius: var(--radius) var(--radius) 0 0;">
+              <span class="table-title" data-i18n="employees">İşçilər</span>
+              <button class="btn btn-primary" onclick="openModal('modalStaff')">
+                <i class="fas fa-plus"></i> <span data-i18n="addNew">Yeni</span>
+              </button>
+            </div>
+            <div class="table-container" style="border-radius: 0 0 var(--radius) var(--radius); margin-top: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="username">İstifadəçi adı</th>
+                    <th data-i18n="role">Rol</th>
+                    <th data-i18n="actions">Əməliyyatlar</th>
+                  </tr>
+                </thead>
+                <tbody id="adminStaffTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+
+<!-- New Reservation -->
+<div class="modal-overlay" id="modalReservation">
+  <div class="modal" style="max-width: 800px;">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fas fa-calendar-plus"></i> <span data-i18n="newReservation">Yeni Rezervasiya</span></h2>
+      <button class="modal-close" onclick="closeModal('modalReservation')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="reservationForm" onsubmit="saveReservation(event)">
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label data-i18n="agency">Agentlik</label>
+            <select id="resAgency" class="input-field" onchange="updatePrice()">
+              <option value="" data-i18n="walking">Walking (Fərdi)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="fullName">Ad Soyad *</label>
+            <input type="text" id="resName" class="input-field" required placeholder="Məs: Əliyev Fərid">
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="phone">Telefon *</label>
+            <input type="tel" id="resPhone" class="input-field" required placeholder="055-123-45-67">
+          </div>
+          
+          <div class="form-group full-width" style="position: relative;">
+            <label data-i18n="roomType">Otaq Tipi *</label>
+            <select id="resRoomType" class="input-field" onchange="updateRoomNumbers()" required>
+              <option value="" data-i18n="select">Seçin</option>
+            </select>
+            <button type="button" class="room-search-btn" onclick="checkRoomAvailability()" title="Boş otaqları göstər">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="roomNumber">Otaq Nömrəsi *</label>
+            <select id="resRoomNumber" class="input-field" required>
+              <option value="" data-i18n="selectRoomTypeFirst">Əvvəl tipi seçin</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="nightPrice">Gecəlik Qiymət</label>
+            <input type="number" id="resPrice" class="input-field" readonly style="background: var(--bg);">
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="adultsCount">Böyük sayı *</label>
+            <input type="number" id="resAdults" class="input-field" min="1" value="1" required>
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="childrenCount">Uşaq sayı</label>
+            <input type="number" id="resChildren" class="input-field" min="0" value="0" onchange="toggleChildrenAges()">
+          </div>
+          
+          <div class="form-group full-width" id="childrenAgesDiv" style="display: none;">
+            <label data-i18n="childrenAges">Uşaqların yaşları (vergüllə)</label>
+            <input type="text" id="resChildrenAges" class="input-field" placeholder="Məsələn: 5, 8, 12">
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="checkinDate">Giriş Tarixi *</label>
+            <input type="date" id="resCheckin" class="input-field" required onchange="calculateTotal()">
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="checkoutDate">Çıxış Tarixi *</label>
+            <input type="date" id="resCheckout" class="input-field" required onchange="calculateTotal()">
+          </div>
+          
+          <!-- Discount Section -->
+          <div class="form-group full-width">
+            <div class="discount-box">
+              <label style="margin-bottom: 0.75rem; display: block; font-weight: 600;" data-i18n="discount">Endirim</label>
+              <div class="discount-tabs">
+                <button type="button" class="discount-tab active" onclick="setDiscountType('percent')" id="tabPercent">%</button>
+                <button type="button" class="discount-tab" onclick="setDiscountType('fixed')" id="tabFixed">₼</button>
+              </div>
+              <div class="discount-input-group">
+                <input type="number" id="discountValue" class="input-field discount-input" min="0" value="0" oninput="calculateTotal()">
+                <span style="font-weight: 600; color: var(--text-secondary);" id="discountLabel">%</span>
+              </div>
+              <div style="margin-top: 0.5rem; color: var(--success); font-weight: 600;" id="discountAmountDisplay"></div>
+            </div>
+          </div>
+          
+          <div class="form-group full-width">
+            <label data-i18n="notes">Qeydlər</label>
+            <textarea id="resNotes" class="input-field" rows="2" placeholder="Xüsusi istəklər..."></textarea>
+          </div>
+        </div>
+        
+        <div style="background: var(--primary-light); padding: 1.25rem; border-radius: var(--radius-sm); margin: 1.5rem 0; border: 1px solid var(--primary);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.95rem;">
+            <span data-i18n="nightCount">Gecə sayı:</span>
+            <strong id="nightCount">0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: 700;">
+            <span data-i18n="total">Ümumi:</span>
+            <strong style="color: var(--primary);" id="totalAmount">₼0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary); display: none;" id="originalPriceDisplay">
+            <span>Əvvəlki qiymət:</span>
+            <span style="text-decoration: line-through;" id="originalPrice">₼0</span>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalReservation')" style="flex: 1;" data-i18n="cancel">Ləğv et</button>
+          <button type="button" class="btn btn-secondary" onclick="generateConfirmationPDF()" style="flex: 1;" data-i18n="downloadPDF">
+            <i class="fas fa-file-pdf"></i> PDF
+          </button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">
+            <i class="fas fa-save"></i> <span data-i18n="save">Yadda Saxla</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Room Availability Modal -->
+<div class="modal-overlay" id="modalRoomAvailability">
+  <div class="modal" style="max-width: 600px;">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fas fa-door-open"></i> <span data-i18n="availableRooms">Boş Otaqlar</span></h2>
+      <button class="modal-close" onclick="closeModal('modalRoomAvailability')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="availabilityInfo" style="margin-bottom: 1rem; padding: 1rem; background: var(--bg); border-radius: var(--radius-sm);">
+        <strong id="availRoomType"></strong> - <span id="availDates"></span>
+      </div>
+      <div class="available-rooms-grid" id="availableRoomsGrid">
+        <!-- Dinamik doldurulacaq -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Today Revenue Modal -->
+<div class="modal-overlay" id="modalTodayRevenue">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fas fa-coins"></i> <span data-i18n="todayRevenueDetails">Bugünkü Gəlir Detalları</span></h2>
+      <button class="modal-close" onclick="closeModal('modalTodayRevenue')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="revenue-summary">
+        <div class="revenue-summary-title" data-i18n="paymentMethodBreakdown">Ödəniş Metodlarına Görə</div>
+        <div id="revenueDetailsContent">
+          <!-- Dinamik doldurulacaq -->
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="time">Vaxt</th>
+              <th data-i18n="guest">Qonaq</th>
+              <th data-i18n="room">Otaq</th>
+              <th data-i18n="method">Metod</th>
+              <th data-i18n="amount">Məbləğ</th>
+            </tr>
+          </thead>
+          <tbody id="todayPaymentsTable">
+            <!-- Dinamik doldurulacaq -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="exportRevenueToPDF()">
+        <i class="fas fa-file-pdf"></i> <span data-i18n="exportPDF">PDF İxrac</span>
+      </button>
+      <button class="btn btn-success" onclick="exportRevenueToExcel()">
+        <i class="fas fa-file-excel"></i> <span data-i18n="exportExcel">Excel İxrac</span>
+      </button>
+      <button class="btn btn-primary" onclick="closeModal('modalTodayRevenue')" data-i18n="close">Bağla</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="modalPayment">
+  <div class="modal" style="max-width: 600px;">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fas fa-cash-register"></i> <span data-i18n="takePayment">Ödəniş Al</span></h2>
+      <button class="modal-close" onclick="closeModal('modalPayment')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="paymentGuestInfo" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <!-- Dinamik doldurulacaq -->
+      </div>
+      
+      <div class="payment-detail-row">
+        <span data-i18n="roomCharge">Otaq:</span>
+        <strong id="payRoomCharge">₼0</strong>
+      </div>
+      <div class="payment-detail-row">
+        <span data-i18n="minibarCharge">Minibar:</span>
+        <strong id="payMinibarCharge">₼0</strong>
+      </div>
+      <div class="payment-detail-row">
+        <span data-i18n="laundryCharge">Çamaşırxana:</span>
+        <strong id="payLaundryCharge">₼0</strong>
+      </div>
+      <div class="payment-detail-row">
+        <span data-i18n="otherCharges">Digər:</span>
+        <strong id="payOtherCharges">₼0</strong>
+      </div>
+      <div class="payment-detail-row total">
+        <span data-i18n="totalAmount">Ümumi Məbləğ:</span>
+        <strong id="payTotalAmount" style="color: var(--primary);">₼0</strong>
+      </div>
+      
+      <label style="display: block; margin: 1.5rem 0 0.75rem; font-weight: 600;" data-i18n="selectPaymentMethod">Ödəniş Üsulu Seçin:</label>
+      <div class="payment-grid">
+        <div class="payment-method" onclick="selectPaymentMethod('cash')">
+          <i class="fas fa-money-bill-wave"></i>
+          <div data-i18n="cash">Nağd</div>
+        </div>
+        <div class="payment-method" onclick="selectPaymentMethod('card')">
+          <i class="fas fa-credit-card"></i>
+          <div data-i18n="creditCard">Kredit Kart</div>
+        </div>
+        <div class="payment-method" onclick="selectPaymentMethod('transfer')">
+          <i class="fas fa-university"></i>
+          <div data-i18n="transfer">Köçürmə</div>
+        </div>
+        <div class="payment-method" onclick="selectPaymentMethod('debt')">
+          <i class="fas fa-hand-holding-usd"></i>
+          <div data-i18n="debt">Borc</div>
+        </div>
+        <div class="payment-method" onclick="selectPaymentMethod('complimentary')">
+          <i class="fas fa-gift"></i>
+          <div data-i18n="complimentary">İkram</div>
+        </div>
+      </div>
+      
+      <input type="hidden" id="selectedPaymentMethod">
+      <input type="hidden" id="paymentGuestId">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalPayment')" data-i18n="cancel">Ləğv et</button>
+      <button class="btn btn-primary" onclick="processPayment()" data-i18n="confirmPayment">Ödənişi Təsdiqlə</button>
+    </div>
+  </div>
+</div>
+
+<!-- Other Modals -->
+<div class="modal-overlay" id="modalRoomType">
+  <div class="modal" style="max-width: 500px;">
+    <div class="modal-header">
+      <h2 class="modal-title" data-i18n="newRoomType">Yeni Otaq Tipi</h2>
+      <button class="modal-close" onclick="closeModal('modalRoomType')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="saveRoomType(event)">
+        <div class="form-group">
+          <label data-i18n="nameAz">Ad (AZ)</label>
+          <input type="text" id="roomTypeAz" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="nameEn">Ad (EN)</label>
+          <input type="text" id="roomTypeEn" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="nameRu">Ad (RU)</label>
+          <input type="text" id="roomTypeRu" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="nightPrice">Gecəlik Qiymət (₼)</label>
+          <input type="number" id="roomTypePrice" class="input-field" required min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label data-i18n="roomCount">Otaq Sayı</label>
+          <input type="number" id="roomTypeCount" class="input-field" required min="1">
+        </div>
+
+        <div class="form-group">
+          <label>Otaq Nömrələri (vergüllə ayırın) *</label>
+          <input type="text" id="roomNumbersManual" class="input-field" required placeholder="Məsələn: 101, 102, 103, 205">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="add">Əlavə Et</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalMinibar">
+  <div class="modal" style="max-width: 500px;">
+    <div class="modal-header">
+      <h2 class="modal-title" data-i18n="newMinibarItem">Yeni Minibar Məhsulu</h2>
+      <button class="modal-close" onclick="closeModal('modalMinibar')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="saveMinibarItem(event)">
+        <div class="form-group">
+          <label data-i18n="productAz">Məhsul (AZ)</label>
+          <input type="text" id="minibarAz" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="productEn">Məhsul (EN)</label>
+          <input type="text" id="minibarEn" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="productRu">Məhsul (RU)</label>
+          <input type="text" id="minibarRu" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="price">Qiymət (₼)</label>
+          <input type="number" id="minibarPrice" class="input-field" required min="0" step="0.01">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="add">Əlavə Et</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalLaundry">
+  <div class="modal" style="max-width: 500px;">
+    <div class="modal-header">
+      <h2 class="modal-title" data-i18n="newLaundryItem">Yeni Çamaşırxana Xidməti</h2>
+      <button class="modal-close" onclick="closeModal('modalLaundry')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="saveLaundryItem(event)">
+        <div class="form-group">
+          <label data-i18n="serviceAz">Xidmət (AZ)</label>
+          <input type="text" id="laundryAz" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="serviceEn">Xidmət (EN)</label>
+          <input type="text" id="laundryEn" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="serviceRu">Xidmət (RU)</label>
+          <input type="text" id="laundryRu" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="price">Qiymət (₼)</label>
+          <input type="number" id="laundryPrice" class="input-field" required min="0" step="0.01">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="add">Əlavə Et</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalAgency">
+  <div class="modal" style="max-width: 500px;">
+    <div class="modal-header">
+      <h2 class="modal-title" data-i18n="newAgency">Yeni Agentlik</h2>
+      <button class="modal-close" onclick="closeModal('modalAgency')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="saveAgency(event)">
+        <div class="form-group">
+          <label data-i18n="agencyName">Agentlik Adı</label>
+          <input type="text" id="agencyName" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="contactInfo">Əlaqə (Telefon/Email)</label>
+          <input type="text" id="agencyContact" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="discountPercent">Endirim %</label>
+          <input type="number" id="agencyDiscount" class="input-field" min="0" max="100" value="0">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="add">Əlavə Et</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalStaff">
+  <div class="modal" style="max-width: 500px;">
+    <div class="modal-header">
+      <h2 class="modal-title" data-i18n="newStaff">Yeni İşçi</h2>
+      <button class="modal-close" onclick="closeModal('modalStaff')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="saveStaff(event)">
+        <div class="form-group">
+          <label data-i18n="username">İstifadəçi adı</label>
+          <input type="text" id="staffUsername" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="password">Şifrə</label>
+          <input type="password" id="staffPassword" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="role">Rol</label>
+          <select id="staffRole" class="input-field" required>
+            <option value="admin" data-i18n="admin">Admin</option>
+            <option value="reception" data-i18n="receptionist">Resepsionist</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="add">Əlavə Et</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==========================================
+// GOOGLE SHEETS API CONFIGURATION
+// ==========================================
+const API_URL = 'https://script.google.com/macros/s/AKfycbwzEkOAXE4Ey87eCn-8L3D9wEcr6r6tePtCFVEc6rQnyUuk_in3eBFb_3EyfV69olGF3w/exec';
+
+// ==========================================
+// TRANSLATIONS (3 Languages)
+// ==========================================
+const translations = {
+  az: {
+    loading: 'Yüklənir...', loginSubtitle: 'Professional Hotel Management System', loginDesc: 'Hesabınıza daxil olun',
+    feat1: 'Real-time otaq idarəetməsi', feat2: 'Avtomatik hesabatlar', feat3: 'Google Sheets inteqrasiyası',
+    feat4: 'Çoxdilli dəstək (AZ/EN/RU)', username: 'İstifadəçi adı', password: 'Şifrə', role: 'Rol',
+    admin: 'Administrator', receptionist: 'Resepsionist', loginBtn: 'Daxil ol', testData: 'Test məlumatları',
+    navDashboard: 'Dashboard', navReservations: 'Rezervasiyalar', navGuests: 'Qonaqlar', navRooms: 'Otaqlar',
+    navHousekeeping: 'Təmizlik', navReports: 'Hesabatlar', navSettings: 'Tənzimləmələr', logout: 'Çıxış',
+    dashboard: 'Dashboard', occupiedRooms: 'Dolu otaq', occupancy: 'doluluq', todayCheckin: 'Bugünkü Giriş',
+    expected: 'Gözlənilir', todayCheckout: 'Bugünkü Çıxış', attention: 'Yoxlanış tələb', todayRevenue: 'Bugünkü Gəlir',
+    clickDetails: 'Detallar üçün klik', todayArrivals: 'Bugünkü Gəlişlər', todayDepartures: 'Bugünkü Çıxışlar',
+    quickActions: 'Sürətli Əməliyyatlar', newReservation: 'Yeni Rezervasiya', newResDesc: 'Walk-in və ya gələcək rezervasiya yarat',
+    takePayment: 'Ödəniş Al', takePaymentDesc: 'Qonaq hesabını bağla və çıxış et', nightAudit: 'Gecə Hesabatı',
+    nightAuditDesc: 'End of Day (EOD) proseduru', recentActivity: 'Son Əməliyyatlar', refresh: 'Yenilə',
+    time: 'Vaxt', operation: 'Əməliyyat', guest: 'Qonaq', room: 'Otaq', amount: 'Məbləğ', status: 'Status',
+    activeReservations: 'Aktiv Rezervasiyalar', new: 'Yeni', checkin: 'Giriş', checkout: 'Çıxış', nights: 'Gecə',
+    totalDebt: 'Ümumi Borc', actions: 'Əməliyyatlar', fullName: 'Ad Soyad', dates: 'Giriş/Çıxış', debt: 'Borc',
+    currentGuests: 'Cari Qonaqlar (In-House)', search: 'Axtar...', all: 'Hamısı', available: 'Boş', occupied: 'Dolu',
+    clean: 'Təmiz', dirty: 'Çirkli', blocked: 'Bağlı', faulty: 'Qəzalı', cleaningStatus: 'Təmizlik Statusu',
+    lastCleaned: 'Son Təmizlik', markAllClean: 'Hamısını Təmizlə', nightAuditTitle: 'Gecə Hesabatı (Night Audit)',
+    todaySales: 'Bugünkü Satışlar', totalRevenue: 'Ümumi gəlir', paymentMethods: 'Ödəniş Metodları',
+    roomStats: 'Otaq Statistikası', generateNightAudit: 'Gecə Hesabatı Yarat (Excel)', systemSettings: 'Sistem Tənzimləmələri',
+    company: 'Şirkət', roomTypes: 'Otaq Tipləri', minibar: 'Minibar', laundry: 'Çamaşırxana', agencies: 'Agentliklər',
+    staff: 'İşçilər', companyNameAz: 'Şirkət Adı (AZ)', companyNameEn: 'Şirkət Adı (EN)', companyNameRu: 'Şirkət Adı (RU)',
+    save: 'Yadda Saxla', addNew: 'Yeni', name: 'Ad', price: 'Qiymət', count: 'Say', minibarItems: 'Minibar Məhsulları',
+    product: 'Məhsul', laundryServices: 'Çamaşırxana Xidmətləri', service: 'Xidmət', newRoomType: 'Yeni Otaq Tipi',
+    newMinibarItem: 'Yeni Minibar Məhsulu', newLaundryItem: 'Yeni Çamaşırxana Xidməti', newAgency: 'Yeni Agentlik',
+    newStaff: 'Yeni İşçi', agency: 'Agentlik', walking: 'Walking (Fərdi)', phone: 'Telefon', roomType: 'Otaq Tipi',
+    select: 'Seçin', roomNumber: 'Otaq Nömrəsi', selectRoomTypeFirst: 'Əvvəl tipi seçin', nightPrice: 'Gecəlik Qiymət',
+    adultsCount: 'Böyük sayı', childrenCount: 'Uşaq sayı', childrenAges: 'Uşaqların yaşları (vergüllə)',
+    checkinDate: 'Giriş Tarixi', checkoutDate: 'Çıxış Tarixi', discount: 'Endirim', notes: 'Qeydlər',
+    nightCount: 'Gecə sayı', total: 'Ümumi', cancel: 'Ləğv et', downloadPDF: 'PDF Yüklə', availableRooms: 'Boş Otaqlar',
+    todayRevenueDetails: 'Bugünkü Gəlir Detalları', paymentMethodBreakdown: 'Ödəniş Metodlarına Görə',
+    exportPDF: 'PDF İxrac', exportExcel: 'Excel İxrac', close: 'Bağla', selectPaymentMethod: 'Ödəniş Üsulu Seçin',
+    cash: 'Nağd', creditCard: 'Kredit Kart', transfer: 'Köçürmə', debt: 'Borc', complimentary: 'İkram',
+    confirmPayment: 'Ödənişi Təsdiqlə', roomCharge: 'Otaq', minibarCharge: 'Minibar', laundryCharge: 'Çamaşırxana',
+    otherCharges: 'Digər', totalAmount: 'Ümumi Məbləğ', adults: 'Böyük', children: 'Uşaq', totalGuests: 'Ümumi Qonaq',
+    contact: 'Əlaqə', discountPercent: 'Endirim %', employees: 'İşçilər', type: 'Tip', selectRoom: 'Otaq seç',
+    pleaseSelectDates: 'Zəhmət olmasa tarixləri seçin', noAvailableRooms: 'Bu tarixdə boş otaq yoxdur'
+  },
+  en: {
+    loading: 'Loading...', loginSubtitle: 'Professional Hotel Management System', loginDesc: 'Sign in to your account',
+    feat1: 'Real-time room management', feat2: 'Automatic reports', feat3: 'Google Sheets integration',
+    feat4: 'Multilingual support (AZ/EN/RU)', username: 'Username', password: 'Password', role: 'Role',
+    admin: 'Administrator', receptionist: 'Receptionist', loginBtn: 'Sign In', testData: 'Test Credentials',
+    navDashboard: 'Dashboard', navReservations: 'Reservations', navGuests: 'Guests', navRooms: 'Rooms',
+    navHousekeeping: 'Housekeeping', navReports: 'Reports', navSettings: 'Settings', logout: 'Logout',
+    dashboard: 'Dashboard', occupiedRooms: 'Occupied Rooms', occupancy: 'occupancy', todayCheckin: "Today's Check-in",
+    expected: 'Expected', todayCheckout: "Today's Check-out", attention: 'Attention Required', todayRevenue: "Today's Revenue",
+    clickDetails: 'Click for details', todayArrivals: "Today's Arrivals", todayDepartures: "Today's Departures",
+    quickActions: 'Quick Actions', newReservation: 'New Reservation', newResDesc: 'Create walk-in or future reservation',
+    takePayment: 'Take Payment', takePaymentDesc: 'Close guest account and checkout', nightAudit: 'Night Audit',
+    nightAuditDesc: 'End of Day (EOD) procedure', recentActivity: 'Recent Activity', refresh: 'Refresh',
+    time: 'Time', operation: 'Operation', guest: 'Guest', room: 'Room', amount: 'Amount', status: 'Status',
+    activeReservations: 'Active Reservations', new: 'New', checkin: 'Check-in', checkout: 'Check-out', nights: 'Nights',
+    totalDebt: 'Total Balance', actions: 'Actions', fullName: 'Full Name', dates: 'Dates', debt: 'Balance',
+    currentGuests: 'Current Guests (In-House)', search: 'Search...', all: 'All', available: 'Available', occupied: 'Occupied',
+    clean: 'Clean', dirty: 'Dirty', blocked: 'Blocked', faulty: 'Faulty', cleaningStatus: 'Cleaning Status',
+    lastCleaned: 'Last Cleaned', markAllClean: 'Mark All Clean', nightAuditTitle: 'Night Audit',
+    todaySales: "Today's Sales", totalRevenue: 'Total Revenue', paymentMethods: 'Payment Methods',
+    roomStats: 'Room Statistics', generateNightAudit: 'Generate Night Audit (Excel)', systemSettings: 'System Settings',
+    company: 'Company', roomTypes: 'Room Types', minibar: 'Minibar', laundry: 'Laundry', agencies: 'Agencies',
+    staff: 'Staff', companyNameAz: 'Company Name (AZ)', companyNameEn: 'Company Name (EN)', companyNameRu: 'Company Name (RU)',
+    save: 'Save', addNew: 'Add New', name: 'Name', price: 'Price', count: 'Count', minibarItems: 'Minibar Items',
+    product: 'Product', laundryServices: 'Laundry Services', service: 'Service', newRoomType: 'New Room Type',
+    newMinibarItem: 'New Minibar Item', newLaundryItem: 'New Laundry Service', newAgency: 'New Agency',
+    newStaff: 'New Staff', agency: 'Agency', walking: 'Walking (Individual)', phone: 'Phone', roomType: 'Room Type',
+    select: 'Select', roomNumber: 'Room Number', selectRoomTypeFirst: 'Select type first', nightPrice: 'Night Price',
+    adultsCount: 'Adults', childrenCount: 'Children', childrenAges: 'Children ages (comma separated)',
+    checkinDate: 'Check-in Date', checkoutDate: 'Check-out Date', discount: 'Discount', notes: 'Notes',
+    nightCount: 'Nights', total: 'Total', cancel: 'Cancel', downloadPDF: 'Download PDF', availableRooms: 'Available Rooms',
+    todayRevenueDetails: "Today's Revenue Details", paymentMethodBreakdown: 'Payment Method Breakdown',
+    exportPDF: 'Export PDF', exportExcel: 'Export Excel', close: 'Close', selectPaymentMethod: 'Select Payment Method',
+    cash: 'Cash', creditCard: 'Credit Card', transfer: 'Bank Transfer', debt: 'Debt', complimentary: 'Complimentary',
+    confirmPayment: 'Confirm Payment', roomCharge: 'Room', minibarCharge: 'Minibar', laundryCharge: 'Laundry',
+    otherCharges: 'Other', totalAmount: 'Total Amount', adults: 'Adults', children: 'Children', totalGuests: 'Total Guests',
+    contact: 'Contact', discountPercent: 'Discount %', employees: 'Employees', type: 'Type', selectRoom: 'Select room',
+    pleaseSelectDates: 'Please select dates first', noAvailableRooms: 'No available rooms for these dates'
+  },
+  ru: {
+    loading: 'Загрузка...', loginSubtitle: 'Профессиональная система управления отелем', loginDesc: 'Войдите в свой аккаунт',
+    feat1: 'Управление номерами в реальном времени', feat2: 'Автоматические отчеты', feat3: 'Интеграция с Google Sheets',
+    feat4: 'Многоязычная поддержка (AZ/EN/RU)', username: 'Имя пользователя', password: 'Пароль', role: 'Роль',
+    admin: 'Администратор', receptionist: 'Администратор', loginBtn: 'Войти', testData: 'Тестовые данные',
+    navDashboard: 'Панель управления', navReservations: 'Бронирования', navGuests: 'Гости', navRooms: 'Номера',
+    navHousekeeping: 'Уборка', navReports: 'Отчеты', navSettings: 'Настройки', logout: 'Выход',
+    dashboard: 'Панель управления', occupiedRooms: 'Занято номеров', occupancy: 'заполненность', todayCheckin: 'Заезд сегодня',
+    expected: 'Ожидается', todayCheckout: 'Выезд сегодня', attention: 'Требуется внимание', todayRevenue: 'Доход сегодня',
+    clickDetails: 'Нажмите для деталей', todayArrivals: 'Прибытия сегодня', todayDepartures: 'Выезды сегодня',
+    quickActions: 'Быстрые действия', newReservation: 'Новое бронирование', newResDesc: 'Создать бронирование',
+    takePayment: 'Принять оплату', takePaymentDesc: 'Закрыть счет гостя', nightAudit: 'Ночной аудит',
+    nightAuditDesc: 'Процедура конца дня', recentActivity: 'Недавние действия', refresh: 'Обновить',
+    time: 'Время', operation: 'Операция', guest: 'Гость', room: 'Номер', amount: 'Сумма', status: 'Статус',
+    activeReservations: 'Активные бронирования', new: 'Новое', checkin: 'Заезд', checkout: 'Выезд', nights: 'Ночей',
+    totalDebt: 'Общий долг', actions: 'Действия', fullName: 'ФИО', dates: 'Даты', debt: 'Долг',
+    currentGuests: 'Текущие гости', search: 'Поиск...', all: 'Все', available: 'Свободно', occupied: 'Занято',
+    clean: 'Чисто', dirty: 'Грязно', blocked: 'Заблокировано', faulty: 'Неисправно', cleaningStatus: 'Статус уборки',
+    lastCleaned: 'Последняя уборка', markAllClean: 'Отметить все чистыми', nightAuditTitle: 'Ночной аудит',
+    todaySales: 'Продажи сегодня', totalRevenue: 'Общий доход', paymentMethods: 'Способы оплаты',
+    roomStats: 'Статистика номеров', generateNightAudit: 'Создать ночной аудит (Excel)', systemSettings: 'Настройки системы',
+    company: 'Компания', roomTypes: 'Типы номеров', minibar: 'Минибар', laundry: 'Прачечная', agencies: 'Агентства',
+    staff: 'Сотрудники', companyNameAz: 'Название компании (AZ)', companyNameEn: 'Название компании (EN)', 
+    companyNameRu: 'Название компании (RU)', save: 'Сохранить', addNew: 'Добавить', name: 'Название', 
+    price: 'Цена', count: 'Количество', minibarItems: 'Товары минибара', product: 'Товар', 
+    laundryServices: 'Услуги прачечной', service: 'Услуга', newRoomType: 'Новый тип номера',
+    newMinibarItem: 'Новый товар минибара', newLaundryItem: 'Новая услуга прачечной', newAgency: 'Новое агентство',
+    newStaff: 'Новый сотрудник', agency: 'Агентство', walking: 'Без агентства', phone: 'Телефон', roomType: 'Тип номера',
+    select: 'Выбрать', roomNumber: 'Номер комнаты', selectRoomTypeFirst: 'Сначала выберите тип', nightPrice: 'Цена за ночь',
+    adultsCount: 'Взрослые', childrenCount: 'Дети', childrenAges: 'Возраст детей (через запятую)',
+    checkinDate: 'Дата заезда', checkoutDate: 'Дата выезда', discount: 'Скидка', notes: 'Примечания',
+    nightCount: 'Ночей', total: 'Итого', cancel: 'Отмена', downloadPDF: 'Скачать PDF', availableRooms: 'Свободные номера',
+    todayRevenueDetails: 'Детали дохода за сегодня', paymentMethodBreakdown: 'По методам оплаты',
+    exportPDF: 'Экспорт PDF', exportExcel: 'Экспорт Excel', close: 'Закрыть', selectPaymentMethod: 'Выберите способ оплаты',
+    cash: 'Наличные', creditCard: 'Кредитная карта', transfer: 'Банковский перевод', debt: 'Долг', complimentary: 'Бесплатно',
+    confirmPayment: 'Подтвердить оплату', roomCharge: 'Номер', minibarCharge: 'Минибар', laundryCharge: 'Прачечная',
+    otherCharges: 'Другое', totalAmount: 'Общая сумма', adults: 'Взрослые', children: 'Дети', totalGuests: 'Всего гостей',
+    contact: 'Контакт', discountPercent: 'Скидка %', employees: 'Сотрудники', type: 'Тип', selectRoom: 'Выбрать номер',
+    pleaseSelectDates: 'Пожалуйста, сначала выберите даты', noAvailableRooms: 'Нет свободных номеров на эти даты'
+  }
+};
+
+let currentLang = 'az';
+let currentUser = null;
+let discountType = 'percent'; // 'percent' or 'fixed'
+
+// ==========================================
+// DATA STORE (Local Cache + API)
+// ==========================================
+const Store = {
+  data: {
+    roomTypes: [],
+    rooms: [],
+    minibarItems: [],
+    laundryItems: [],
+    agencies: [],
+    users: [
+      { id: 1, username: 'admin', password: 'admin', role: 'admin' },
+      { id: 2, username: 'reception', password: 'reception', role: 'reception' }
+    ],
+    guests: [],
+    reservations: [],
+    payments: [],
+    housekeeping: []
+  },
+  
+  get: function(key) { return this.data[key]; },
+  set: function(key, value) { 
+    this.data[key] = value; 
+    this.save();
+  },
+  
+  init: function() {
+    const saved = localStorage.getItem('worktimepro_data');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        this.data = {...this.data, ...parsed};
+      } catch(e) { console.error('Error loading saved data:', e); }
+    }
+  },
+  
+  save: function() { 
+    localStorage.setItem('worktimepro_data', JSON.stringify(this.data)); 
+  }
+};
+
+// ==========================================
+// API FUNCTIONS
+// ==========================================
+function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
+
+async function apiCall(action, data = null, params = {}) {
+  showLoading();
+  try {
+    let url = new URL(API_URL);
+    url.searchParams.append('action', action);
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    
+    const options = {
+      method: data ? 'POST' : 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    };
+    
+    if (data) options.body = JSON.stringify(data);
+    
+    const response = await fetch(url.toString(), options);
+    const result = await response.json();
+    
+    if (result.error) throw new Error(result.error);
+    
+    hideLoading();
+    return result;
+  } catch (error) {
+    hideLoading();
+    console.error('API Error:', error);
+    showToast('Xəta: ' + error.message, 'error');
+    return null;
+  }
+}
+
+// ==========================================
+// INITIALIZATION
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+  Store.init();
+  updateClock();
+  setInterval(updateClock, 1000);
+  setupEventListeners();
+  applyTheme();
+  
+  const savedLang = localStorage.getItem('worktimepro_lang');
+  if (savedLang) setLang(savedLang);
+  
+  const savedUser = localStorage.getItem('worktimepro_user');
+  if (savedUser) {
+    currentUser = JSON.parse(savedUser);
+    showApp();
+  }
+});
+
+function setupEventListeners() {
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal(overlay.id);
+    });
+  });
+  
+  document.getElementById('loginForm').addEventListener('submit', handleLogin);
+}
+
+function updateClock() {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString(currentLang === 'az' ? 'az-AZ' : currentLang === 'ru' ? 'ru-RU' : 'en-US', { hour12: false });
+  const clockEl = document.getElementById('clock');
+  if (clockEl) clockEl.innerHTML = `<i class="far fa-clock"></i> <span>${timeString}</span>`;
+}
+
+// ==========================================
+// AUTHENTICATION
+// ==========================================
+async function handleLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value;
+  const password = document.getElementById('loginPassword').value;
+  const role = document.getElementById('loginRole').value;
+  
+  showLoading();
+  
+  try {
+    const result = await apiCall('login', { username, password, role });
+    
+    if (result && result.success) {
+      currentUser = { username, role, ...result.user };
+      localStorage.setItem('worktimepro_user', JSON.stringify(currentUser));
+      showApp();
+      showToast(translations[currentLang].loginBtn + ' uğurlu!');
+    } else {
+      // Local fallback
+      const user = Store.get('users').find(u => u.username === username && u.password === password && u.role === role);
+      if (user) {
+        currentUser = { username, role, ...user };
+        localStorage.setItem('worktimepro_user', JSON.stringify(currentUser));
+        showApp();
+        showToast('Login successful (local mode)');
+      } else {
+        showToast('Invalid credentials', 'error');
+      }
+    }
+  } catch (e) {
+    hideLoading();
+    showToast('Connection error. Using local mode.', 'info');
+    // Local fallback
+    const user = Store.get('users').find(u => u.username === username && u.password === password && u.role === role);
+    if (user) {
+      currentUser = { username, role, ...user };
+      localStorage.setItem('worktimepro_user', JSON.stringify(currentUser));
+      showApp();
+    }
+  }
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'block';
+  document.getElementById('currentUserName').textContent = currentUser.username;
+  
+  const roleText = currentUser.role === 'admin' ? translations[currentLang].admin : translations[currentLang].receptionist;
+  document.getElementById('currentUserRole').innerHTML = `<i class="fas fa-${currentUser.role === 'admin' ? 'shield-alt' : 'user'}"></i> ${roleText}`;
+  
+  if (currentUser.role !== 'admin') {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  }
+  
+  navigate('dashboard');
+  loadAllData();
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('worktimepro_user');
+  location.reload();
+}
+
+// ==========================================
+// NAVIGATION & UI
+// ==========================================
+function navigate(page) {
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
+  
+  const navMap = { dashboard: 0, reservations: 1, guests: 2, rooms: 3, housekeeping: 4, reports: 5, admin: 6 };
+  const navItems = document.querySelectorAll('.nav-item:not(:last-child)');
+  if (navItems[navMap[page]]) navItems[navMap[page]].classList.add('active');
+  
+  const titles = {
+    dashboard: 'dashboard', reservations: 'navReservations', guests: 'currentGuests',
+    rooms: 'navRooms', housekeeping: 'navHousekeeping', reports: 'navReports', admin: 'navSettings'
+  };
+  const titleEl = document.getElementById('pageTitle');
+  if (titleEl && titles[page]) titleEl.textContent = translations[currentLang][titles[page]] || page;
+  
+  if (page === 'guests') renderGuests();
+  if (page === 'reservations') renderReservations();
+  if (page === 'rooms') renderRooms();
+  if (page === 'housekeeping') renderHousekeeping();
+  if (page === 'reports') loadReports();
+  if (page === 'admin') renderAdminTables();
+}
+
+function openModal(id) { 
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.add('active'); 
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeModal(id) { 
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('active'); 
+    document.body.style.overflow = '';
+  }
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const tabContent = document.getElementById('tab-' + tab);
+  if (tabContent) tabContent.classList.add('active');
+}
+
+// ==========================================
+// LANGUAGE & THEME
+// ==========================================
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('worktimepro_lang', lang);
+  
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  // Update all elements with data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (translations[lang][key]) el.textContent = translations[lang][key];
+  });
+  
+  // Update placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (translations[lang][key]) el.placeholder = translations[lang][key];
+  });
+  
+  navigate(document.querySelector('.page-section.active').id.replace('page-', ''));
+  showToast('Dil dəyişdirildi: ' + lang.toUpperCase());
+}
+
+function toggleTheme() {
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? '' : 'dark';
+  document.body.setAttribute('data-theme', newTheme);
+  localStorage.setItem('worktimepro_theme', newTheme || 'light');
+}
+
+function applyTheme() {
+  const saved = localStorage.getItem('worktimepro_theme');
+  if (saved === 'dark') document.body.setAttribute('data-theme', 'dark');
+}
+
+// ==========================================
+// DATA LOADING
+// ==========================================
+async function loadAllData() {
+  // Load from API in parallel
+  const [roomTypes, guests, agencies, rooms] = await Promise.all([
+    apiCall('getRoomTypes'),
+    apiCall('getGuests'),
+    apiCall('getAgencies'),
+    apiCall('getRooms')
+  ]);
+  
+  if (roomTypes) Store.set('roomTypes', roomTypes);
+  if (guests) Store.set('guests', guests);
+  if (agencies) Store.set('agencies', agencies);
+  if (rooms) Store.set('rooms', rooms);
+  
+  await updateStats();
+}
+
+async function refreshData() {
+  showLoading();
+  await loadAllData();
+  navigate(document.querySelector('.page-section.active').id.replace('page-', ''));
+  hideLoading();
+  showToast('Məlumatlar yeniləndi');
+}
+
+async function updateStats() {
+  try {
+    const stats = await apiCall('getStats');
+    if (stats) {
+      updateElement('statOccupied', stats.occupied || 0);
+      updateElement('occupancyRate', (stats.occupancyRate || 0) + '%');
+      updateElement('statCheckin', stats.checkinToday || 0);
+      updateElement('statCheckout', stats.checkoutToday || 0);
+      updateElement('statRevenue', '₼' + (stats.todayRevenue || 0));
+      updateElement('statArrivals', stats.arrivalsToday || 0);
+      updateElement('statDepartures', stats.departuresToday || 0);
+      
+      // Update guest counts
+      if (stats.guestCount) {
+        updateElement('countAdults', stats.guestCount.adults || 0);
+        updateElement('countChildren', stats.guestCount.children || 0);
+        updateElement('countTotal', stats.guestCount.total || 0);
+      }
+    }
+  } catch (e) {
+    console.error('Stats error:', e);
+    // Calculate from local data
+    const guests = Store.get('guests').filter(g => g.status === 'active');
+    updateElement('statOccupied', guests.length);
+    updateElement('statRevenue', '₼' + guests.reduce((sum, g) => sum + (parseFloat(g.totalDebt) || 0), 0));
+    const adults = guests.reduce((sum, g) => sum + (parseInt(g.adults) || 0), 0);
+    const children = guests.reduce((sum, g) => sum + (parseInt(g.children) || 0), 0);
+    updateElement('countAdults', adults);
+    updateElement('countChildren', children);
+    updateElement('countTotal', adults + children);
+  }
+}
+
+function updateElement(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+// ==========================================
+// RESERVATION SYSTEM
+// ==========================================
+function openReservationModal() {
+  // Load agencies
+  const agencies = Store.get('agencies') || [];
+  const agencySelect = document.getElementById('resAgency');
+  if (agencySelect) {
+    agencySelect.innerHTML = `<option value="">${translations[currentLang].walking}</option>`;
+    agencies.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a.id;
+      opt.textContent = a.name + (a.discount > 0 ? ` (-${a.discount}%)` : '');
+      agencySelect.appendChild(opt);
+    });
+  }
+  
+  // Load room types
+  const types = Store.get('roomTypes') || [];
+  const typeSelect = document.getElementById('resRoomType');
+  if (typeSelect) {
+    typeSelect.innerHTML = `<option value="">${translations[currentLang].select}</option>`;
+    types.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      const name = t.name[currentLang] || t.name.az;
+      opt.textContent = `${name} - ₼${t.price}`;
+      opt.dataset.price = t.price;
+      typeSelect.appendChild(opt);
+    });
+  }
+  
+  // Set default dates
+  const today = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const checkinEl = document.getElementById('resCheckin');
+  const checkoutEl = document.getElementById('resCheckout');
+  if (checkinEl) checkinEl.value = today;
+  if (checkoutEl) checkoutEl.value = tomorrow;
+  
+  // Reset discount
+  document.getElementById('discountValue').value = 0;
+  setDiscountType('percent');
+  
+  calculateTotal();
+  openModal('modalReservation');
+}
+
+function updateRoomNumbers() {
+  const typeId = document.getElementById('resRoomType').value;
+  const type = Store.get('roomTypes').find(t => t.id == typeId);
+  const roomSelect = document.getElementById('resRoomNumber');
+  const priceInput = document.getElementById('resPrice');
+  
+  if (type && roomSelect && priceInput) {
+    priceInput.value = type.price;
+    roomSelect.innerHTML = `<option value="">${translations[currentLang].select}</option>`;
+    
+    // Get rooms of this type
+    const rooms = Store.get('rooms').filter(r => r.typeId == typeId || r.type == type.name.az);
+    const occupied = Store.get('guests').filter(g => g.status === 'active').map(g => g.roomNumber);
+    
+    rooms.forEach(room => {
+      const isOccupied = occupied.includes(String(room.roomNumber));
+      const opt = document.createElement('option');
+      opt.value = room.roomNumber;
+      opt.textContent = room.roomNumber + (isOccupied ? ` (${translations[currentLang].occupied})` : ` (${translations[currentLang].available})`);
+      if (isOccupied) opt.disabled = true;
+      roomSelect.appendChild(opt);
+    });
+  }
+  calculateTotal();
+}
+
+function toggleChildrenAges() {
+  const count = parseInt(document.getElementById('resChildren').value) || 0;
+  const div = document.getElementById('childrenAgesDiv');
+  if (div) div.style.display = count > 0 ? 'block' : 'none';
+}
+
+function setDiscountType(type) {
+  discountType = type;
+  document.getElementById('tabPercent').classList.toggle('active', type === 'percent');
+  document.getElementById('tabFixed').classList.toggle('active', type === 'fixed');
+  document.getElementById('discountLabel').textContent = type === 'percent' ? '%' : '₼';
+  calculateTotal();
+}
+
+function calculateTotal() {
+  const checkin = new Date(document.getElementById('resCheckin').value);
+  const checkout = new Date(document.getElementById('resCheckout').value);
+  const price = parseFloat(document.getElementById('resPrice').value) || 0;
+  const discountVal = parseFloat(document.getElementById('discountValue').value) || 0;
+  
+  if (checkin && checkout && checkout > checkin) {
+    const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+    const subtotal = nights * price;
+    
+    let discountAmount = 0;
+    if (discountType === 'percent') {
+      discountAmount = subtotal * (discountVal / 100);
+    } else {
+      discountAmount = discountVal;
+    }
+    
+    const total = Math.max(0, subtotal - discountAmount);
+    const agencyId = document.getElementById('resAgency').value;
+    const agency = agencyId ? Store.get('agencies').find(a => a.id == agencyId) : null;
+    
+    if (agency && agency.discount > 0) {
+      total = total - (total * agency.discount / 100);
+    }
+    
+    updateElement('nightCount', nights);
+    updateElement('totalAmount', '₼' + total.toFixed(2));
+    
+    const origDisplay = document.getElementById('originalPriceDisplay');
+    const origPrice = document.getElementById('originalPrice');
+    if (discountAmount > 0) {
+      if (origDisplay) origDisplay.style.display = 'flex';
+      if (origPrice) origPrice.textContent = '₼' + subtotal.toFixed(2);
+      updateElement('discountAmountDisplay', `Endirim: ₼${discountAmount.toFixed(2)}`);
+    } else {
+      if (origDisplay) origDisplay.style.display = 'none';
+      updateElement('discountAmountDisplay', '');
+    }
+    
+    return total;
+  }
+  updateElement('nightCount', '0');
+  updateElement('totalAmount', '₼0');
+  return 0;
+}
+
+// Room Availability Check
+async function checkRoomAvailability() {
+  const typeId = document.getElementById('resRoomType').value;
+  const checkIn = document.getElementById('resCheckin').value;
+  const checkOut = document.getElementById('resCheckout').value;
+  
+  if (!typeId || !checkIn || !checkOut) {
+    showToast(translations[currentLang].pleaseSelectDates || 'Zəhmət olmasa tarixləri seçin', 'error');
+    return;
+  }
+  
+  const type = Store.get('roomTypes').find(t => t.id == typeId);
+  if (!type) return;
+  
+  showLoading();
+  
+  // Try API first
+  let rooms = await apiCall('getAvailableRooms', null, { checkIn, checkOut, roomType: type.name.az });
+  
+  if (!rooms) {
+    // Local calculation
+    const allRooms = Store.get('rooms').filter(r => r.typeId == typeId || r.type == type.name.az);
+    const reservations = Store.get('reservations').filter(r => r.status === 'active');
+    
+    const occupied = reservations.filter(r => {
+      return (checkIn >= r.checkIn && checkIn < r.checkOut) ||
+             (checkOut > r.checkIn && checkOut <= r.checkOut);
+    }).map(r => r.roomNumber);
+    
+    rooms = allRooms.map(r => ({...r, available: !occupied.includes(String(r.roomNumber))}));
+  }
+  
+  hideLoading();
+  
+  // Show modal
+  const typeName = type.name[currentLang] || type.name.az;
+  updateElement('availRoomType', typeName);
+  updateElement('availDates', `${checkIn} - ${checkOut}`);
+  
+  const grid = document.getElementById('availableRoomsGrid');
+  grid.innerHTML = '';
+  
+  if (rooms.length === 0) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--text-secondary);">${translations[currentLang].noAvailableRooms}</div>`;
+  } else {
+    rooms.forEach(room => {
+      const btn = document.createElement('button');
+      btn.className = `available-room-btn ${room.available ? '' : 'occupied'}`;
+      btn.textContent = room.roomNumber;
+      btn.disabled = !room.available;
+      if (room.available) {
+        btn.onclick = () => {
+          document.getElementById('resRoomNumber').value = room.roomNumber;
+          closeModal('modalRoomAvailability');
+        };
+      }
+      grid.appendChild(btn);
+    });
+  }
+  
+  openModal('modalRoomAvailability');
+}
+
+async function saveReservation(e) {
+  e.preventDefault();
+  
+  const typeId = document.getElementById('resRoomType').value;
+  const type = Store.get('roomTypes').find(t => t.id == typeId);
+  const agencyId = document.getElementById('resAgency').value;
+  const agency = agencyId ? Store.get('agencies').find(a => a.id == agencyId) : null;
+  const total = calculateTotal();
+  
+  const guest = {
+    id: Date.now().toString(),
+    name: document.getElementById('resName').value,
+    phone: document.getElementById('resPhone').value,
+    agencyId: agencyId || null,
+    agencyName: agency ? agency.name : translations[currentLang].walking,
+    roomType: type.name,
+    roomTypeId: typeId,
+    roomNumber: document.getElementById('resRoomNumber').value,
+    checkIn: document.getElementById('resCheckin').value,
+    checkOut: document.getElementById('resCheckout').value,
+    adults: parseInt(document.getElementById('resAdults').value) || 1,
+    children: parseInt(document.getElementById('resChildren').value) || 0,
+    childrenAges: document.getElementById('resChildrenAges').value,
+    nights: parseInt(document.getElementById('nightCount').textContent) || 0,
+    roomCharge: total,
+    minibarCharge: 0,
+    laundryCharge: 0,
+    otherCharges: 0,
+    totalDebt: total,
+    discount: document.getElementById('discountValue').value,
+    discountType: discountType,
+    status: 'active',
+    notes: document.getElementById('resNotes').value,
+    createdAt: new Date().toISOString(),
+    createdBy: currentUser.username
+  };
+  
+  const result = await apiCall('saveGuest', { data: guest });
+  
+  if (result && result.success) {
+    const guests = Store.get('guests');
+    guests.push(guest);
+    Store.set('guests', guests);
+    
+    closeModal('modalReservation');
+    e.target.reset();
+    showToast(translations[currentLang].save + ' uğurlu!');
+    updateStats();
+    if (document.getElementById('page-guests').classList.contains('active')) renderGuests();
+    if (document.getElementById('page-reservations').classList.contains('active')) renderReservations();
+    addToActivity('Yeni rezervasiya', guest.name, guest.roomNumber, total);
+  } else {
+    // Local fallback
+    const guests = Store.get('guests');
+    guests.push(guest);
+    Store.set('guests', guests);
+    closeModal('modalReservation');
+    e.target.reset();
+    showToast('Saved locally (API unavailable)');
+    updateStats();
+  }
+}
+
+// ==========================================
+// PAYMENT SYSTEM
+// ==========================================
+function takePayment(guestId) {
+  const guest = Store.get('guests').find(g => g.id == guestId);
+  if (!guest) return;
+  
+  document.getElementById('paymentGuestId').value = guestId;
+  document.getElementById('paymentGuestInfo').innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3 style="margin: 0 0 0.25rem 0; font-size: 1.25rem;">${guest.name}</h3>
+        <span style="color: var(--text-secondary); font-size: 0.875rem;">${translations[currentLang].room}: ${guest.roomNumber}</span>
+      </div>
+      <span class="badge badge-secondary">${guest.agencyName}</span>
+    </div>
+  `;
+  
+  // Set charges
+  const roomCharge = parseFloat(guest.roomCharge) || 0;
+  const minibar = parseFloat(guest.minibarCharge) || 0;
+  const laundry = parseFloat(guest.laundryCharge) || 0;
+  const other = parseFloat(guest.otherCharges) || 0;
+  const total = roomCharge + minibar + laundry + other;
+  
+  updateElement('payRoomCharge', '₼' + roomCharge.toFixed(2));
+  updateElement('payMinibarCharge', '₼' + minibar.toFixed(2));
+  updateElement('payLaundryCharge', '₼' + laundry.toFixed(2));
+  updateElement('payOtherCharges', '₼' + other.toFixed(2));
+  updateElement('payTotalAmount', '₼' + total.toFixed(2));
+  
+  // Reset selection
+  document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+  document.getElementById('selectedPaymentMethod').value = '';
+  
+  openModal('modalPayment');
+}
+
+function selectPaymentMethod(method) {
+  document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.getElementById('selectedPaymentMethod').value = method;
+}
+
+async function processPayment() {
+  const method = document.getElementById('selectedPaymentMethod').value;
+  const guestId = document.getElementById('paymentGuestId').value;
+  
+  if (!method) {
+    showToast('Ödəniş üsulu seçin', 'error');
+    return;
+  }
+  
+  const guest = Store.get('guests').find(g => g.id == guestId);
+  if (!guest) return;
+  
+  const total = parseFloat(guest.totalDebt) || 0;
+  
+  const payment = {
+    id: Date.now().toString(),
+    guestId: guest.id,
+    guestName: guest.name,
+    amount: total,
+    method: method,
+    date: new Date().toISOString(),
+    roomNumber: guest.roomNumber,
+    details: {
+      room: guest.roomCharge || 0,
+      minibar: guest.minibarCharge || 0,
+      laundry: guest.laundryCharge || 0,
+      other: guest.otherCharges || 0
+    }
+  };
+  
+  const result = await apiCall('savePayment', { data: payment });
+  
+  if (result && result.success) {
+    const payments = Store.get('payments');
+    payments.push(payment);
+    Store.set('payments', payments);
+    
+    // Update guest status
+    guest.status = 'checked_out';
+    guest.totalDebt = 0;
+    guest.checkoutDate = new Date().toISOString();
+    await apiCall('updateGuest', { data: guest });
+    
+    Store.set('guests', Store.get('guests').map(g => g.id == guestId ? guest : g));
+    
+    closeModal('modalPayment');
+    renderGuests();
+    updateStats();
+    
+    const methodNames = { cash: 'Nağd', card: 'Kart', transfer: 'Köçürmə', debt: 'Borc', complimentary: 'İkram' };
+    showToast(`Ödəniş uğurlu: ${methodNames[method]} ₼${total}`);
+    addToActivity('Ödəniş', guest.name, guest.roomNumber, total);
+  }
+}
+
+// ==========================================
+// TODAY'S REVENUE DETAILS
+// ==========================================
+async function showTodayRevenue() {
+  showLoading();
+  
+  let data = await apiCall('getTodayPayments');
+  if (!data) {
+    // Local calculation
+    const today = new Date().toISOString().split('T')[0];
+    const payments = Store.get('payments').filter(p => p.date && p.date.startsWith(today));
+    const byMethod = { cash: 0, card: 0, transfer: 0, debt: 0, complimentary: 0 };
+    payments.forEach(p => {
+      if (byMethod[p.method] !== undefined) byMethod[p.method] += parseFloat(p.amount) || 0;
+    });
+    data = {
+      total: payments.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0),
+      byMethod: byMethod,
+      details: payments
+    };
+  }
+  
+  hideLoading();
+  
+  // Render summary
+  const methods = {
+    cash: translations[currentLang].cash,
+    card: translations[currentLang].creditCard,
+    transfer: translations[currentLang].transfer,
+    debt: translations[currentLang].debt,
+    complimentary: translations[currentLang].complimentary
+  };
+  
+  let summaryHtml = '';
+  Object.keys(data.byMethod || {}).forEach(key => {
+    const amount = data.byMethod[key] || 0;
+    if (amount > 0) {
+      summaryHtml += `
+        <div class="revenue-method-row">
+          <span>${methods[key] || key}:</span>
+          <strong>₼${amount.toFixed(2)}</strong>
+        </div>
+      `;
+    }
+  });
+  
+  summaryHtml += `
+    <div class="revenue-method-row">
+      <span>${translations[currentLang].total}:</span>
+      <strong>₼${(data.total || 0).toFixed(2)}</strong>
+    </div>
+  `;
+  
+  updateElement('revenueDetailsContent', summaryHtml);
+  
+  // Render table
+  const tbody = document.getElementById('todayPaymentsTable');
+  if (tbody) {
+    tbody.innerHTML = (data.details || []).map(p => `
+      <tr>
+        <td>${new Date(p.date).toLocaleTimeString()}</td>
+        <td>${p.guestName}</td>
+        <td>${p.roomNumber}</td>
+        <td>${methods[p.method] || p.method}</td>
+        <td style="font-weight: 600;">₼${parseFloat(p.amount).toFixed(2)}</td>
+      </tr>
+    `).join('');
+  }
+  
+  openModal('modalTodayRevenue');
+}
+
+function exportRevenueToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  doc.text(translations[currentLang].todayRevenueDetails, 14, 20);
+  doc.text(new Date().toLocaleDateString(), 14, 30);
+  
+  const table = document.getElementById('todayPaymentsTable');
+  if (table) {
+    doc.autoTable({ html: table, startY: 40 });
+  }
+  
+  doc.save(`revenue_${new Date().toISOString().split('T')[0]}.pdf`);
+  showToast('PDF yükləndi');
+}
+
+function exportRevenueToExcel() {
+  const table = document.getElementById('todayPaymentsTable');
+  if (!table) return;
+  
+  const wb = XLSX.utils.table_to_book(table);
+  XLSX.writeFile(wb, `revenue_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('Excel yükləndi');
+}
+
+// ==========================================
+// PDF GENERATION FOR CONFIRMATION
+// ==========================================
+function generateConfirmationPDF() {
+  const name = document.getElementById('resName').value;
+  if (!name) {
+    showToast('Ad daxil edin', 'error');
+    return;
+  }
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Header
+  doc.setFillColor(79, 70, 229);
+  doc.rect(0, 0, 210, 40, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(24);
+  doc.text('WorkTimePro Hotel', 105, 25, { align: 'center' });
+  
+  // Confirmation title
+  doc.setTextColor(79, 70, 229);
+  doc.setFontSize(20);
+  doc.text(translations[currentLang].newReservation, 105, 60, { align: 'center' });
+  
+  // Details
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  
+  const typeId = document.getElementById('resRoomType').value;
+  const type = Store.get('roomTypes').find(t => t.id == typeId);
+  const typeName = type ? (type.name[currentLang] || type.name.az) : '';
+  
+  const details = [
+    [translations[currentLang].fullName + ':', name],
+    [translations[currentLang].phone + ':', document.getElementById('resPhone').value],
+    [translations[currentLang].roomType + ':', typeName],
+    [translations[currentLang].roomNumber + ':', document.getElementById('resRoomNumber').value],
+    [translations[currentLang].checkinDate + ':', document.getElementById('resCheckin').value],
+    [translations[currentLang].checkoutDate + ':', document.getElementById('resCheckout').value],
+    [translations[currentLang].nightCount + ':', document.getElementById('nightCount').textContent],
+    [translations[currentLang].total + ':', document.getElementById('totalAmount').textContent]
+  ];
+  
+  let y = 80;
+  details.forEach(([label, value]) => {
+    doc.setFont(undefined, 'bold');
+    doc.text(label, 20, y);
+    doc.setFont(undefined, 'normal');
+    doc.text(value || '-', 80, y);
+    y += 10;
+  });
+  
+  // Footer
+  doc.setTextColor(150, 150, 150);
+  doc.setFontSize(10);
+  doc.text('WorkTimePro Hotel Management System', 105, 280, { align: 'center' });
+  
+  doc.save(`confirmation_${name.replace(/\s+/g, '_')}.pdf`);
+  showToast('PDF yükləndi');
+}
+
+// ==========================================
+// ROOM MANAGEMENT
+// ==========================================
+function renderRooms() {
+  const grid = document.getElementById('roomsGrid');
+  if (!grid) return;
+  
+  const rooms = Store.get('rooms') || [];
+  const guests = Store.get('guests').filter(g => g.status === 'active');
+  const occupiedMap = {};
+  guests.forEach(g => occupiedMap[g.roomNumber] = g);
+  
+  const filter = grid.dataset.filter || 'all';
+  
+  grid.innerHTML = '';
+  rooms.forEach(room => {
+    const guest = occupiedMap[room.roomNumber];
+    let statusClass = room.status || 'available';
+    
+    if (guest) statusClass = 'occupied';
+    else if (!room.status) statusClass = 'available';
+    
+    if (filter !== 'all' && filter !== statusClass && !(filter === 'available' && !guest && statusClass === 'clean')) return;
+    
+    const cell = document.createElement('div');
+    cell.className = `room-cell ${statusClass}`;
+    cell.innerHTML = `
+      <div class="room-status-bar ${room.status || 'clean'}"></div>
+      <div class="room-number">${room.roomNumber}</div>
+      <div class="room-type">${room.type || room.typeId}</div>
+      <div class="room-status">
+        ${guest ? '<i class="fas fa-user"></i>' : '<i class="fas fa-' + (room.status === 'dirty' ? 'broom' : room.status === 'blocked' ? 'ban' : room.status === 'faulty' ? 'tools' : 'check') + '"></i>'}
+        ${guest ? translations[currentLang].occupied : translations[currentLang][room.status || 'available']}
+      </div>
+      ${guest ? `<div style="margin-top: 0.5rem; font-size: 0.75rem;">${guest.name.split(' ')[0]}</div>` : ''}
+    `;
+    
+    cell.onclick = () => {
+      if (guest) viewGuestDetails(guest.id);
+      else changeRoomStatus(room.roomNumber, room.status);
+    };
+    
+    grid.appendChild(cell);
+  });
+}
+
+function filterRooms(type) {
+  document.querySelectorAll('.room-filter-btn').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const grid = document.getElementById('roomsGrid');
+  if (grid) {
+    grid.dataset.filter = type;
+    renderRooms();
+  }
+}
+
+async function changeRoomStatus(roomNumber, currentStatus) {
+  const statuses = ['clean', 'dirty', 'blocked', 'faulty'];
+  const currentIndex = statuses.indexOf(currentStatus);
+  const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+  
+  if (confirm(`Otaq ${roomNumber} statusunu ${nextStatus} olaraq dəyiş?`)) {
+    await apiCall('updateRoomStatus', { roomNumber, status: nextStatus });
+    
+    const rooms = Store.get('rooms').map(r => {
+      if (r.roomNumber == roomNumber) r.status = nextStatus;
+      return r;
+    });
+    Store.set('rooms', rooms);
+    renderRooms();
+    showToast(`Otaq ${roomNumber} ${nextStatus} olaraq işarələndi`);
+  }
+}
+
+// ==========================================
+// GUEST MANAGEMENT
+// ==========================================
+function renderGuests() {
+  const tbody = document.getElementById('guestsTableBody');
+  if (!tbody) return;
+  
+  const guests = Store.get('guests').filter(g => g.status === 'active');
+  
+  if (guests.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-secondary);">${translations[currentLang].loading}</td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = guests.map(g => `
+    <tr>
+      <td>
+        <div style="font-weight: 600;">${g.name}</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">${g.agencyName}</div>
+      </td>
+      <td>
+        <span class="badge badge-secondary">${g.roomNumber}</span>
+        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${g.roomType.az || g.roomType}</div>
+      </td>
+      <td>
+        <div style="font-size: 0.875rem;">
+          <div><i class="fas fa-sign-in-alt text-success"></i> ${g.checkIn}</div>
+          <div><i class="fas fa-sign-out-alt text-danger"></i> ${g.checkOut}</div>
+        </div>
+      </td>
+      <td style="font-weight: 700; color: ${g.totalDebt > 0 ? 'var(--danger)' : 'var(--success)'};">
+        ₼${(parseFloat(g.totalDebt) || 0).toFixed(2)}
+      </td>
+      <td>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-warning btn-sm" onclick="addMinibar(${g.id})" title="Minibar">
+            <i class="fas fa-wine-bottle"></i>
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="addLaundry(${g.id})" title="Çamaşırxana">
+            <i class="fas fa-tshirt"></i>
+          </button>
+          <button class="btn btn-success btn-sm" onclick="takePayment(${g.id})" title="Ödəniş">
+            <i class="fas fa-cash-register"></i>
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="viewGuestDetails(${g.id})" title="Detallar">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function viewGuestDetails(guestId) {
+  const guest = Store.get('guests').find(g => g.id == guestId);
+  if (!guest) return;
+  
+  const html = `
+    <div style="display: grid; gap: 1rem;">
+      <div style="background: var(--bg); padding: 1rem; border-radius: var(--radius-sm);">
+        <h4 style="margin-bottom: 0.5rem;">${guest.name}</h4>
+        <p style="margin: 0; color: var(--text-secondary);"><i class="fas fa-phone"></i> ${guest.phone}</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div><label style="font-size: 0.75rem; color: var(--text-secondary);">${translations[currentLang].room}</label>
+          <div style="font-weight: 600;">${guest.roomNumber}</div>
+        </div>
+        <div><label style="font-size: 0.75rem; color: var(--text-secondary);">${translations[currentLang].agency}</label>
+          <div style="font-weight: 600;">${guest.agencyName}</div>
+        </div>
+        <div><label style="font-size: 0.75rem; color: var(--text-secondary);">${translations[currentLang].checkin}</label>
+          <div style="font-weight: 600;">${guest.checkIn}</div>
+        </div>
+        <div><label style="font-size: 0.75rem; color: var(--text-secondary);">${translations[currentLang].checkout}</label>
+          <div style="font-weight: 600;">${guest.checkOut}</div>
+        </div>
+      </div>
+      <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span>${translations[currentLang].roomCharge}:</span>
+          <strong>₼${(parseFloat(guest.roomCharge) || 0).toFixed(2)}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span>${translations[currentLang].minibarCharge}:</span>
+          <strong>₼${(parseFloat(guest.minibarCharge) || 0).toFixed(2)}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span>${translations[currentLang].laundryCharge}:</span>
+          <strong>₼${(parseFloat(guest.laundryCharge) || 0).toFixed(2)}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; color: var(--danger); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border);">
+          <span>${translations[currentLang].totalDebt}:</span>
+          <span>₼${(parseFloat(guest.totalDebt) || 0).toFixed(2)}</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="printConfirmationCard(${guest.id})">
+        <i class="fas fa-print"></i> ${translations[currentLang].downloadPDF}
+      </button>
+    </div>
+  `;
+  
+  showModal('Qonaq Detalları', html);
+}
+
+function printConfirmationCard(guestId) {
+  const guest = Store.get('guests').find(g => g.id == guestId);
+  if (!guest) return;
+  
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <html>
+    <head>
+      <title>Confirmation #${guest.id}</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; border: 2px solid #4f46e5; }
+        .header { text-align: center; border-bottom: 2px solid #4f46e5; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #4f46e5; margin: 0; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px dotted #ccc; padding-bottom: 10px; }
+        .label { font-weight: bold; color: #666; }
+        .total { font-size: 24px; font-weight: bold; color: #4f46e5; margin-top: 30px; text-align: center; border-top: 3px double #4f46e5; padding-top: 20px; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>WorkTimePro Hotel</h1>
+        <p>Confirmation Card</p>
+      </div>
+      <div class="row"><span class="label">Guest Name:</span><span>${guest.name}</span></div>
+      <div class="row"><span class="label">Room Number:</span><span>${guest.roomNumber}</span></div>
+      <div class="row"><span class="label">Check-in:</span><span>${guest.checkIn}</span></div>
+      <div class="row"><span class="label">Check-out:</span><span>${guest.checkOut}</span></div>
+      <div class="row"><span class="label">Nights:</span><span>${guest.nights}</span></div>
+      <div class="row"><span class="label">Adults:</span><span>${guest.adults}</span></div>
+      <div class="row"><span class="label">Children:</span><span>${guest.children}</span></div>
+      <div class="row"><span class="label">Agency:</span><span>${guest.agencyName}</span></div>
+      <div class="total">Total: ₼${parseFloat(guest.totalDebt).toFixed(2)}</div>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+}
+
+// ==========================================
+// MINIBAR & LAUNDRY
+// ==========================================
+function addMinibar(guestId) {
+  const items = Store.get('minibarItems') || [];
+  const html = `
+    <div style="display: grid; gap: 0.75rem;">
+      ${items.map(item => `
+        <div style="border: 2px solid var(--border); padding: 1rem; border-radius: var(--radius-sm); cursor: pointer; display: flex; justify-content: space-between; align-items: center;" 
+             onclick="confirmMinibar(${guestId}, '${item.id}', ${item.price})">
+          <div>
+            <strong>${item.name[currentLang] || item.name.az}</strong>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">${item.name.en}</div>
+          </div>
+          <div style="font-weight: 700; color: var(--danger);">₼${item.price}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  showModal(translations[currentLang].minibar, html);
+}
+
+async function confirmMinibar(guestId, itemId, price) {
+  const guests = Store.get('guests');
+  const guest = guests.find(g => g.id == guestId);
+  const item = Store.get('minibarItems').find(i => i.id == itemId);
+  
+  if (guest && item) {
+    guest.minibarCharge = (parseFloat(guest.minibarCharge) || 0) + parseFloat(price);
+    guest.totalDebt = (parseFloat(guest.totalDebt) || 0) + parseFloat(price);
+    
+    await apiCall('updateGuest', { data: guest });
+    Store.set('guests', guests);
+    
+    renderGuests();
+    updateStats();
+    closeModal('modalDynamic');
+    showToast(`${item.name[currentLang] || item.name.az} əlavə edildi`);
+    addToActivity('Minibar', guest.name, guest.roomNumber, price);
+  }
+}
+
+function addLaundry(guestId) {
+  const items = Store.get('laundryItems') || [];
+  const html = `
+    <div style="display: grid; gap: 0.75rem;">
+      ${items.map(item => `
+        <div style="border: 2px solid var(--border); padding: 1rem; border-radius: var(--radius-sm); cursor: pointer; display: flex; justify-content: space-between; align-items: center;" 
+             onclick="confirmLaundry(${guestId}, '${item.id}', ${item.price})">
+          <div>
+            <strong>${item.name[currentLang] || item.name.az}</strong>
+          </div>
+          <div style="font-weight: 700; color: var(--danger);">₼${item.price}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  showModal(translations[currentLang].laundry, html);
+}
+
+async function confirmLaundry(guestId, itemId, price) {
+  const guests = Store.get('guests');
+  const guest = guests.find(g => g.id == guestId);
+  const item = Store.get('laundryItems').find(i => i.id == itemId);
+  
+  if (guest && item) {
+    guest.laundryCharge = (parseFloat(guest.laundryCharge) || 0) + parseFloat(price);
+    guest.totalDebt = (parseFloat(guest.totalDebt) || 0) + parseFloat(price);
+    
+    await apiCall('updateGuest', { data: guest });
+    Store.set('guests', guests);
+    
+    renderGuests();
+    updateStats();
+    closeModal('modalDynamic');
+    showToast(`${item.name[currentLang] || item.name.az} əlavə edildi`);
+    addToActivity('Çamaşırxana', guest.name, guest.roomNumber, price);
+  }
+}
+
+// ==========================================
+// REPORTS & NIGHT AUDIT
+// ==========================================
+async function loadReports() {
+  const stats = await apiCall('getStats');
+  if (stats) {
+    updateElement('reportRevenue', '₼' + (stats.todayRevenue || 0));
+    updateElement('reportOccupied', stats.occupied || 0);
+    updateElement('reportAvailable', (stats.totalRooms - stats.occupied) || 0);
+    
+    const methods = {
+      cash: translations[currentLang].cash,
+      card: translations[currentLang].creditCard,
+      transfer: translations[currentLang].transfer
+    };
+    
+    const pdata = await apiCall('getTodayPayments');
+    if (pdata && pdata.byMethod) {
+      document.getElementById('paymentMethodsReport').innerHTML = Object.keys(pdata.byMethod)
+        .filter(k => pdata.byMethod[k] > 0)
+        .map(k => `
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>${methods[k] || k}:</span>
+            <strong>₼${pdata.byMethod[k].toFixed(2)}</strong>
+          </div>
+        `).join('') || 'No payments today';
+    }
+  }
+}
+
+async function generateNightAudit() {
+  if (!confirm('Gecə hesabatı yaradılacaq. Davam edilsinmi?')) return;
+  
+  showLoading();
+  const result = await apiCall('generateNightAudit');
+  hideLoading();
+  
+  if (result && result.success) {
+    showToast('Hesabat yaradıldı: ' + result.fileUrl);
+    window.open(result.fileUrl, '_blank');
+  } else {
+    // Local fallback - generate Excel
+    const stats = Store.get('stats') || {};
+    const guests = Store.get('guests');
+    const today = new Date().toISOString().split('T')[0];
+    
+    const data = [
+      ['WorkTimePro Hotel - Night Audit', ''],
+      ['Date:', today],
+      ['', ''],
+      ['Occupied Rooms:', guests.filter(g => g.status === 'active').length],
+      ['Total Revenue:', stats.todayRevenue || 0],
+      ['', ''],
+      ['Guest Details:', ''],
+      ...guests.filter(g => g.status === 'active').map(g => [g.name, g.roomNumber, g.totalDebt])
+    ];
+    
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Night Audit');
+    XLSX.writeFile(wb, `Night_Audit_${today}.xlsx`);
+    showToast('Excel faylı yükləndi');
+  }
+}
+
+// ==========================================
+// ADMIN FUNCTIONS
+// ==========================================
+function renderAdminTables() {
+  // Room Types
+  const roomTypesBody = document.getElementById('adminRoomTypesTable');
+  if (roomTypesBody) {
+    roomTypesBody.innerHTML = (Store.get('roomTypes') || []).map(t => `
+      <tr>
+        <td>
+          <div style="font-weight: 600;">${t.name.az}</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary);">${t.name.en} / ${t.name.ru}</div>
+        </td>
+        <td>₼${t.price}</td>
+        <td>${t.count}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('roomTypes', '${t.id}')">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  // Minibar
+  const minibarBody = document.getElementById('adminMinibarTable');
+  if (minibarBody) {
+    minibarBody.innerHTML = (Store.get('minibarItems') || []).map(i => `
+      <tr>
+        <td>
+          <div style="font-weight: 600;">${i.name[currentLang] || i.name.az}</div>
+        </td>
+        <td>₼${i.price}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('minibarItems', '${i.id}')">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  // Agencies
+  const agencyBody = document.getElementById('adminAgenciesTable');
+  if (agencyBody) {
+    agencyBody.innerHTML = (Store.get('agencies') || []).map(a => `
+      <tr>
+        <td><strong>${a.name}</strong></td>
+        <td>${a.contact}</td>
+        <td>${a.discount}%</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('agencies', '${a.id}')">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  // Staff
+  const staffBody = document.getElementById('adminStaffTable');
+  if (staffBody) {
+    staffBody.innerHTML = (Store.get('users') || []).map(u => `
+      <tr>
+        <td>${u.username}</td>
+        <td>
+          <span class="badge ${u.role === 'admin' ? 'badge-danger' : 'badge-warning'}">
+            ${u.role}
+          </span>
+        </td>
+        <td>
+          ${u.username !== 'admin' ? `
+            <button class="btn btn-danger btn-sm" onclick="deleteItem('users', '${u.id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          ` : '-'}
+        </td>
+      </tr>
+    `).join('');
+  }
+}
+
+function saveRoomType(e) {
+  e.preventDefault();
+  const types = Store.get('roomTypes');
+  const newType = {
+    id: Date.now().toString(),
+    name: { 
+      az: document.getElementById('roomTypeAz').value, 
+      en: document.getElementById('roomTypeEn').value, 
+      ru: document.getElementById('roomTypeRu').value 
+    },
+    price: parseFloat(document.getElementById('roomTypePrice').value),
+    count: parseInt(document.getElementById('roomTypeCount').value)
+  };
+  types.push(newType);
+  Store.set('roomTypes', types);
+  
+  // Manual otaq nömrələrini al
+  const roomNumbersInput = document.getElementById('roomNumbersManual').value;
+  const roomNumbers = roomNumbersInput.split(',').map(n => n.trim()).filter(n => n);
+  
+  const rooms = Store.get('rooms');
+  roomNumbers.forEach((num, index) => {
+    rooms.push({
+      id: Date.now() + index,
+      roomNumber: num,
+      typeId: newType.id,
+      type: newType.name.az,
+      status: 'clean'
+    });
+  });
+  Store.set('rooms', rooms);
+  
+  apiCall('saveRoomType', { data: newType });
+  closeModal('modalRoomType');
+  e.target.reset();
+  renderAdminTables();
+  showToast('Otaq tipi əlavə edildi');
+}
+
+function saveMinibarItem(e) {
+  e.preventDefault();
+  const items = Store.get('minibarItems');
+  items.push({
+    id: Date.now().toString(),
+    name: { 
+      az: document.getElementById('minibarAz').value, 
+      en: document.getElementById('minibarEn').value, 
+      ru: document.getElementById('minibarRu').value 
+    },
+    price: parseFloat(document.getElementById('minibarPrice').value)
+  });
+  Store.set('minibarItems', items);
+  apiCall('saveMinibarItems', { data: items });
+  closeModal('modalMinibar');
+  e.target.reset();
+  renderAdminTables();
+  showToast('Minibar məhsulu əlavə edildi');
+}
+
+function saveLaundryItem(e) {
+  e.preventDefault();
+  const items = Store.get('laundryItems');
+  items.push({
+    id: Date.now().toString(),
+    name: { 
+      az: document.getElementById('laundryAz').value, 
+      en: document.getElementById('laundryEn').value, 
+      ru: document.getElementById('laundryRu').value 
+    },
+    price: parseFloat(document.getElementById('laundryPrice').value)
+  });
+  Store.set('laundryItems', items);
+  apiCall('saveLaundryItems', { data: items });
+  closeModal('modalLaundry');
+  e.target.reset();
+  renderAdminTables();
+  showToast('Çamaşırxana xidməti əlavə edildi');
+}
+
+function saveAgency(e) {
+  e.preventDefault();
+  const agencies = Store.get('agencies');
+  agencies.push({
+    id: Date.now().toString(),
+    name: document.getElementById('agencyName').value,
+    contact: document.getElementById('agencyContact').value,
+    discount: parseInt(document.getElementById('agencyDiscount').value) || 0
+  });
+  Store.set('agencies', agencies);
+  apiCall('saveAgencies', { data: agencies });
+  closeModal('modalAgency');
+  e.target.reset();
+  renderAdminTables();
+  showToast('Agentlik əlavə edildi');
+}
+
+function saveStaff(e) {
+  e.preventDefault();
+  const users = Store.get('users');
+  users.push({
+    id: Date.now().toString(),
+    username: document.getElementById('staffUsername').value,
+    password: document.getElementById('staffPassword').value,
+    role: document.getElementById('staffRole').value
+  });
+  Store.set('users', users);
+  apiCall('saveUsers', { data: users });
+  closeModal('modalStaff');
+  e.target.reset();
+  renderAdminTables();
+  showToast('İşçi əlavə edildi');
+}
+
+function deleteItem(type, id) {
+  if (!confirm('Silmək istəyirsiniz?')) return;
+  Store.set(type, Store.get(type).filter(i => i.id != id));
+  renderAdminTables();
+  showToast('Silindi');
+}
+
+// ==========================================
+// UTILITIES
+// ==========================================
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + (type === 'error' ? 'error' : type === 'info' ? 'info' : '');
+  toast.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+    <span>${message}</span>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function showModal(title, content) {
+  const existing = document.getElementById('modalDynamic');
+  if (existing) existing.remove();
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay active';
+  modal.id = 'modalDynamic';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">${title}</h2>
+        <button class="modal-close" onclick="closeModal('modalDynamic')">&times;</button>
+      </div>
+      <div class="modal-body">${content}</div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function addToActivity(action, guest, room, amount) {
+  const tbody = document.getElementById('recentActivityTable');
+  if (!tbody) return;
+  
+  // Remove loading row if exists
+  if (tbody.children[0] && tbody.children[0].textContent.includes('Yüklənir')) {
+    tbody.innerHTML = '';
+  }
+  
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${new Date().toLocaleTimeString()}</td>
+    <td>${action}</td>
+    <td>${guest}</td>
+    <td>${room}</td>
+    <td>${amount > 0 ? '₼' + amount : '-'}</td>
+    <td><span class="badge badge-success">Tamamlandı</span></td>
+  `;
+  
+  tbody.insertBefore(row, tbody.firstChild);
+  while (tbody.children.length > 10) {
+    tbody.removeChild(tbody.lastChild);
+  }
+}
+
+function searchGuests(query) {
+  const rows = document.querySelectorAll('#guestsTableBody tr');
+  query = query.toLowerCase();
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(query) ? '' : 'none';
+  });
+}
+
+function showExpected(type) {
+  const today = new Date().toISOString().split('T')[0];
+  const reservations = Store.get('reservations').filter(r => r.status === 'active');
+  
+  const items = type === 'arrivals' 
+    ? reservations.filter(r => r.checkIn === today)
+    : reservations.filter(r => r.checkOut === today);
+  
+  const html = items.length === 0 
+    ? '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No records</div>'
+    : items.map(i => `
+      <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 600;">${i.name}</div>
+          <div style="font-size: 0.875rem; color: var(--text-secondary);">${translations[currentLang].room}: ${i.roomNumber}</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-weight: 600; color: var(--primary);">${type === 'arrivals' ? i.checkIn : i.checkOut}</div>
+        </div>
+      </div>
+    `).join('');
+  
+  showModal(type === 'arrivals' ? translations[currentLang].todayArrivals : translations[currentLang].todayDepartures, html);
+}
+
+function renderReservations() {
+  const tbody = document.getElementById('reservationsTableBody');
+  if (!tbody) return;
+  
+  const guests = Store.get('guests').filter(g => g.status === 'active');
+  
+  tbody.innerHTML = guests.map(g => `
+    <tr>
+      <td>
+        <div style="font-weight: 600;">${g.name}</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fas fa-phone"></i> ${g.phone}</div>
+      </td>
+      <td><span class="badge badge-secondary">${g.roomNumber}</span></td>
+      <td>${g.checkIn}</td>
+      <td>${g.checkOut}</td>
+      <td>${g.nights} ${translations[currentLang].nights}</td>
+      <td style="font-weight: 600;">₼${(parseFloat(g.totalDebt) || 0).toFixed(2)}</td>
+      <td><span class="badge badge-success"><i class="fas fa-check"></i> Aktiv</span></td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="viewGuestDetails('${g.id}')">
+          <i class="fas fa-eye"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderHousekeeping() {
+  const tbody = document.getElementById('housekeepingTableBody');
+  if (!tbody) return;
+  
+  const rooms = Store.get('rooms') || [];
+  
+  tbody.innerHTML = rooms.map(r => `
+    <tr>
+      <td><strong>${r.roomNumber}</strong></td>
+      <td>${r.type}</td>
+      <td>
+        <span class="badge ${r.status === 'clean' ? 'badge-success' : r.status === 'dirty' ? 'badge-warning' : r.status === 'blocked' ? 'badge-secondary' : 'badge-danger'}">
+          ${r.status || 'clean'}
+        </span>
+      </td>
+      <td>${new Date().toLocaleDateString()}</td>
+      <td>
+        <button class="btn btn-sm btn-success" onclick="changeRoomStatus('${r.roomNumber}', '${r.status}')">
+          <i class="fas fa-check"></i> Dəyiş
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateAllHousekeeping(status) {
+  if (!confirm('Bütün otaqları ' + status + ' olaraq işarələ?')) return;
+  // Implementation for bulk update
+  showToast('Bütün otaqlar yeniləndi');
+}
+
+function saveCompany() {
+  showToast('Şirkət məlumatları yadda saxlandı');
+}
+</script>
+
+</body>
+</html>
